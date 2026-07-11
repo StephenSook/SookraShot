@@ -1,0 +1,37 @@
+# Xcode / build products
+build/
+DerivedData/
+*.xcodeproj
+!default.xcodeproj
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+
+# SwiftPM
+.build/
+.swiftpm/
+Package.resolved
+
+# macOS
+.DS_Store
+.AppleDouble
+._*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Env / secrets (none expected — cardinal rule)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs / temp
+*.log
+/tmp/
+
+# Local research PDFs stay out of the repo (large binaries)
+*.pdf
