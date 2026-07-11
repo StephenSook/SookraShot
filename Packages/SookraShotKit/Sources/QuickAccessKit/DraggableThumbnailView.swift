@@ -24,6 +24,12 @@ final class DraggableThumbnailView: NSImageView, NSDraggingSource {
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError("not used") }
 
+    /// The Quick Access panel is a non-activating background-app window, so the
+    /// first click that starts a drag-out lands while another app is frontmost.
+    /// Same first-mouse rule as the selection overlay: accept it so the drag
+    /// begins on the first click instead of just activating the window.
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+
     override func mouseDown(with event: NSEvent) {
         mouseDownLocation = convert(event.locationInWindow, from: nil)
     }
