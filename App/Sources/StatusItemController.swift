@@ -73,6 +73,10 @@ final class StatusItemController: NSObject {
             menu.addItem(.separator())
         }
 
+        menu.addItem(actionItem("Open History Folder", #selector(openHistory)))
+        menu.addItem(actionItem("Close All Pins", #selector(closeAllPins)))
+        menu.addItem(actionItem("Settings…", #selector(openSettings)))
+        menu.addItem(.separator())
         menu.addItem(
             NSMenuItem(
                 title: "Quit SookraShot",
@@ -115,6 +119,18 @@ final class StatusItemController: NSObject {
 
     @objc private func stopRecording() {
         coordinator.stopRecording()
+    }
+
+    @objc private func openHistory() {
+        NSWorkspace.shared.activateFileViewerSelecting([coordinator.historyDirectory])
+    }
+
+    @objc private func closeAllPins() {
+        coordinator.closeAllPins()
+    }
+
+    @objc private func openSettings() {
+        SettingsWindowController.present()
     }
 
     @objc private func openScreenRecordingSettings() {

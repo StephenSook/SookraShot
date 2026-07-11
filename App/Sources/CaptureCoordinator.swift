@@ -2,7 +2,9 @@ import AnnotationKit
 import AppKit
 import CaptureKit
 import OCRKit
+import HistoryKit
 import OverlayKit
+import PinKit
 import QuickAccessKit
 import RecordingKit
 import ScrollCaptureKit
@@ -17,6 +19,8 @@ final class CaptureCoordinator {
     private let recorder = ScreenRecorder()
     private var exportAsGIF = false
     private var scrollSession: ScrollCaptureSession?
+    private let pins = PinController()
+    private let history = HistoryStore()
 
     var onRecordingStateChange: (@MainActor (Bool) -> Void)? {
         get { recorder.onStateChange }
@@ -29,6 +33,15 @@ final class CaptureCoordinator {
         quickAccess.onAnnotate = { capture in
             AnnotationEditorWindowController.present(capture: capture)
         }
+        quickAccess.onPin = { [weak self] capture in
+            self?.pins.pin(capture)
+        }
+    }
+
+    var historyDirectory: URL { history.directory }
+
+    func closeAllPins() {
+        pins.closeAll()
     }
 
     // MARK: - Scrolling capture
@@ -215,6 +228,7 @@ final class CaptureCoordinator {
 
     private func deliver(_ image: CGImage, displayID: CGDirectDisplayID?) {
         let capture = DeliveredCapture(image: image, displayID: displayID)
+        history.record(capture)
         quickAccess.present(capture)
     }
 }
