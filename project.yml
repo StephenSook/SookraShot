@@ -19,6 +19,9 @@ targets:
       - package: SookraShotKit
         products:
           - SharedKit
+          - CaptureKit
+          - OverlayKit
+          - HotkeyKit
     info:
       path: App/Info.plist
       properties:

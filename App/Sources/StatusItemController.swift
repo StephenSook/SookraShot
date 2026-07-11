@@ -3,8 +3,10 @@ import AppKit
 @MainActor
 final class StatusItemController: NSObject {
     private var statusItem: NSStatusItem?
+    private let coordinator: CaptureCoordinator
 
-    override init() {
+    init(coordinator: CaptureCoordinator) {
+        self.coordinator = coordinator
         super.init()
         installStatusItem()
         // macOS 26 has open reports of third-party status items intermittently
@@ -41,21 +43,14 @@ final class StatusItemController: NSObject {
     private func buildMenu() -> NSMenu {
         let menu = NSMenu()
 
-        for title in ["Capture Area", "Capture Window", "Capture Fullscreen"] {
-            let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
-            item.isEnabled = false
-            menu.addItem(item)
-        }
+        // No keyEquivalents here — global hotkeys own the shortcuts; menu
+        // equivalents would double-fire when the app is active.
+        menu.addItem(actionItem("Capture Area", #selector(captureArea)))
+        menu.addItem(actionItem("Capture Fullscreen", #selector(captureFullscreen)))
         menu.addItem(.separator())
 
         if !ScreenRecordingPermission.granted {
-            let permissionItem = NSMenuItem(
-                title: "Grant Screen Recording Access…",
-                action: #selector(openScreenRecordingSettings),
-                keyEquivalent: ""
-            )
-            permissionItem.target = self
-            menu.addItem(permissionItem)
+            menu.addItem(actionItem("Grant Screen Recording Access…", #selector(openScreenRecordingSettings)))
             menu.addItem(.separator())
         }
 
@@ -67,6 +62,20 @@ final class StatusItemController: NSObject {
             )
         )
         return menu
+    }
+
+    private func actionItem(_ title: String, _ action: Selector) -> NSMenuItem {
+        let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
+        item.target = self
+        return item
+    }
+
+    @objc private func captureArea() {
+        coordinator.captureArea()
+    }
+
+    @objc private func captureFullscreen() {
+        coordinator.captureFullscreen()
     }
 
     @objc private func openScreenRecordingSettings() {

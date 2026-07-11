@@ -1,8 +1,12 @@
 import AppKit
+import HotkeyKit
 
 @main
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItemController: StatusItemController?
+    private var captureCoordinator: CaptureCoordinator?
+    private let hotkeyCenter = HotkeyCenter()
 
     static func main() {
         let app = NSApplication.shared
@@ -12,14 +16,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        statusItemController = StatusItemController()
+        let coordinator = CaptureCoordinator()
+        captureCoordinator = coordinator
+        statusItemController = StatusItemController(coordinator: coordinator)
         ScreenRecordingPermission.requestIfNeeded()
+
+        hotkeyCenter.onActivate { action in
+            switch action {
+            case .captureArea, .allInOne:
+                coordinator.captureArea()
+            case .captureFullscreen:
+                coordinator.captureFullscreen()
+            case .captureText:
+                // OCR arrives in Phase 3; area capture until then.
+                coordinator.captureArea()
+            }
+        }
     }
 
     func application(_ application: NSApplication, open urls: [URL]) {
-        // sookrashot:// URL scheme — routed once capture actions exist.
+        guard let coordinator = captureCoordinator else { return }
         for url in urls {
-            NSLog("SookraShot URL received: \(url.absoluteString)")
+            switch url.host() {
+            case "capture-area":
+                coordinator.captureArea()
+            case "capture-fullscreen":
+                coordinator.captureFullscreen()
+            default:
+                NSLog("SookraShot: unhandled URL \(url.absoluteString)")
+            }
         }
     }
 }
