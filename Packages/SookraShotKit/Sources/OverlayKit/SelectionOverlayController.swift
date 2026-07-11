@@ -25,14 +25,13 @@ public final class SelectionOverlayController {
                 panels.append(panel)
             }
 
-            // Activate the app and make the overlay the key window BEFORE the
-            // user clicks. A background (LSUIElement) app's overlay opens
-            // inactive, so the first press is an app-activating click — and
-            // macOS discards the drag that rides along with an activating
-            // click, which is why area-select only worked over the (already
-            // frontmost) desktop and never over another app like a browser.
-            // With the app active and the panel key up front, the press is a
-            // normal drag.
+            // Genuinely activate the app and make the overlay key+main so it
+            // holds key for the ENTIRE press-drag-release. A nonactivating
+            // panel drops the drag stream after one event (proven by
+            // instrumentation); only real activation keeps the key window
+            // through the drag. Flip to .regular so an .accessory app is
+            // actually allowed to take focus; restored in finish().
+            NSApp.setActivationPolicy(.regular)
             NSApp.activate(ignoringOtherApps: true)
             let mouse = NSEvent.mouseLocation
             let target = panels.first { NSMouseInRect(mouse, $0.frame, false) } ?? panels.first
@@ -40,6 +39,10 @@ public final class SelectionOverlayController {
                 panel.orderFrontRegardless()
             }
             target?.makeKeyAndOrderFront(nil)
+            target?.makeMain()
+            if let view = target?.contentView {
+                target?.makeFirstResponder(view)
+            }
         }
     }
 
@@ -50,8 +53,7 @@ public final class SelectionOverlayController {
             panel.orderOut(nil)
         }
         panels.removeAll()
-        // Return focus to whatever the user was in so copy/paste and drag-out
-        // land in the right app.
+        NSApp.setActivationPolicy(.accessory)
         previousApp?.activate()
         previousApp = nil
         continuation.resume(returning: result)

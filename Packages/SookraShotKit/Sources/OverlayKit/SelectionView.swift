@@ -24,11 +24,6 @@ final class SelectionView: NSView {
 
     override var acceptsFirstResponder: Bool { true }
 
-    /// Belt-and-suspenders: the app is activated when the overlay opens, but
-    /// keep this so a click is always delivered as a real mouseDown even if the
-    /// window is momentarily inactive.
-    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
-
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         window?.makeFirstResponder(self)
