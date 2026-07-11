@@ -28,6 +28,9 @@ let package = Package(
         if name == "HotkeyKit" {
             dependencies.append(.product(name: "KeyboardShortcuts", package: "KeyboardShortcuts"))
         }
+        if name == "QuickAccessKit" {
+            dependencies.append("ExportKit")
+        }
         return .target(name: name, dependencies: dependencies)
     } + [
         .testTarget(name: "SharedKitTests", dependencies: ["SharedKit"])
