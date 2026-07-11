@@ -7,10 +7,9 @@ xcuserdata/
 *.xcuserstate
 *.xcscmblueprint
 
-# SwiftPM
+# SwiftPM (Package.resolved is committed — lockfile rule)
 .build/
 .swiftpm/
-Package.resolved
 
 # macOS
 .DS_Store

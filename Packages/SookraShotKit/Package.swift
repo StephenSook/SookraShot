@@ -20,11 +20,15 @@ let package = Package(
     name: "SookraShotKit",
     platforms: [.macOS("26.0")],
     products: modules.map { .library(name: $0, targets: [$0]) },
-    targets: modules.map { name in
-        .target(
-            name: name,
-            dependencies: name == "SharedKit" ? [] : ["SharedKit"]
-        )
+    dependencies: [
+        .package(url: "https://github.com/sindresorhus/KeyboardShortcuts", from: "2.0.0")
+    ],
+    targets: modules.map { name -> Target in
+        var dependencies: [Target.Dependency] = name == "SharedKit" ? [] : ["SharedKit"]
+        if name == "HotkeyKit" {
+            dependencies.append(.product(name: "KeyboardShortcuts", package: "KeyboardShortcuts"))
+        }
+        return .target(name: name, dependencies: dependencies)
     } + [
         .testTarget(name: "SharedKitTests", dependencies: ["SharedKit"])
     ]
