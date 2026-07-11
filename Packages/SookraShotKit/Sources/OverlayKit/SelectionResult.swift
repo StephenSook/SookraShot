@@ -6,6 +6,8 @@ public enum SelectionResult: Sendable {
     case area(displayID: CGDirectDisplayID, rectInDisplay: CGRect, scale: CGFloat)
     case window(windowID: CGWindowID, scale: CGFloat)
     case cancelled
+    /// Accessibility permission is required to run the mouse tap.
+    case permissionRequired
 }
 
 extension NSScreen {

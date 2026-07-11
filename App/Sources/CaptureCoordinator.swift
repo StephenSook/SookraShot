@@ -44,6 +44,12 @@ final class CaptureCoordinator {
         pins.closeAll()
     }
 
+    /// The mouse tap needs Accessibility. Trigger the system prompt (adds
+    /// SookraShot to the Accessibility list and offers to open System Settings).
+    private func showAccessibilityAlert() {
+        SelectionOverlayController.requestPermission()
+    }
+
     // MARK: - Scrolling capture
 
     /// Select a region, then capture-and-stitch while the user scrolls.
@@ -54,6 +60,7 @@ final class CaptureCoordinator {
 
     private func runScrollCapture() async {
         let result = await overlay.beginSelection()
+        if case .permissionRequired = result { showAccessibilityAlert(); return }
         guard case .area(let displayID, let rectInDisplay, let scale) = result else { return }
         let session = ScrollCaptureSession()
         scrollSession = session
@@ -113,6 +120,9 @@ final class CaptureCoordinator {
             target = .area(displayID: displayID, rectInDisplay: rectInDisplay, scale: scale)
         case .window(let windowID, let scale):
             target = .window(windowID, scale: scale)
+        case .permissionRequired:
+            showAccessibilityAlert()
+            return
         case .cancelled:
             return
         }
@@ -169,6 +179,9 @@ final class CaptureCoordinator {
                 image = try await capturer.captureRect(rectInDisplay, displayID: displayID, scale: scale)
             case .window(let windowID, let scale):
                 image = try await capturer.captureWindow(windowID: windowID, scale: scale)
+            case .permissionRequired:
+                showAccessibilityAlert()
+                return
             case .cancelled:
                 return
             }
@@ -201,6 +214,8 @@ final class CaptureCoordinator {
             case .window(let windowID, let scale):
                 let image = try await capturer.captureWindow(windowID: windowID, scale: scale)
                 deliver(image, displayID: screenUnderMouse()?.displayID)
+            case .permissionRequired:
+                showAccessibilityAlert()
             case .cancelled:
                 break
             }

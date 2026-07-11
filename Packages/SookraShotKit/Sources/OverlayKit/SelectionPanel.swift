@@ -1,20 +1,17 @@
 import AppKit
 
-/// Full-screen transparent overlay window hosting the selection view on one
-/// display.
-///
-/// A plain activating window (NOT a nonactivating panel) that becomes key AND
-/// main. Instrumentation proved a nonactivating panel receives the mouseDown
-/// but loses key the instant the drag starts (the app isn't truly active), so
-/// the drag stream drops after one stray event. Genuine app activation
-/// (.regular + activate in the controller) keeps this window key for the whole
-/// press-drag-release, which is what actually delivers a continuous drag.
+/// Full-screen transparent draw-only overlay for one display. It never handles
+/// mouse events itself (ignoresMouseEvents = true); MouseCaptureTap drives the
+/// selection. This is the only reliable way to capture a drag over another app.
 @MainActor
-final class SelectionPanel: NSWindow {
-    init(screen: NSScreen, snapper: WindowSnapper, onFinish: @escaping @MainActor (SelectionResult) -> Void) {
+final class SelectionPanel: NSPanel {
+    let selectionView: SelectionView
+
+    init(screen: NSScreen) {
+        self.selectionView = SelectionView(screen: screen)
         super.init(
             contentRect: screen.frame,
-            styleMask: [.borderless],
+            styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
@@ -25,11 +22,8 @@ final class SelectionPanel: NSWindow {
         hasShadow = false
         hidesOnDeactivate = false
         animationBehavior = .none
-        acceptsMouseMovedEvents = true
-        contentView = SelectionView(screen: screen, snapper: snapper, onFinish: onFinish)
+        ignoresMouseEvents = true // visual only; input comes from the event tap
+        contentView = selectionView
         setFrame(screen.frame, display: true)
     }
-
-    override var canBecomeKey: Bool { true }
-    override var canBecomeMain: Bool { true }
 }
