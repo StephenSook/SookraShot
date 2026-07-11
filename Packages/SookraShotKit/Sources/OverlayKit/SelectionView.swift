@@ -24,12 +24,9 @@ final class SelectionView: NSView {
 
     override var acceptsFirstResponder: Bool { true }
 
-    /// SookraShot is a background (LSUIElement) app, so its overlay is always an
-    /// inactive window while another app is frontmost. Without this, macOS treats
-    /// the first click as a window-activation click and never delivers mouseDown,
-    /// so drag-select silently fails over any other app (it only "worked" on the
-    /// bare desktop, where nothing else was active). Returning true delivers the
-    /// click as a real mouseDown without activating the app.
+    /// Belt-and-suspenders: the app is activated when the overlay opens, but
+    /// keep this so a click is always delivered as a real mouseDown even if the
+    /// window is momentarily inactive.
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 
     override func viewDidMoveToWindow() {
@@ -58,6 +55,7 @@ final class SelectionView: NSView {
     // MARK: - Mouse
 
     override func mouseMoved(with event: NSEvent) {
+        NSCursor.crosshair.set()
         guard dragStart == nil else { return }
         let screenPoint = screenPoint(from: event)
         hoveredWindow = snapper.window(at: screenPoint)
@@ -70,6 +68,7 @@ final class SelectionView: NSView {
     }
 
     override func mouseDragged(with event: NSEvent) {
+        NSCursor.crosshair.set()
         guard let start = dragStart else { return }
         let current = convert(event.locationInWindow, from: nil)
         dragRect = NSRect(
