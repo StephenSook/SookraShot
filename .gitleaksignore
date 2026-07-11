@@ -1,0 +1,2 @@
+6612a601dafe9ac0a2580db3bb4327fea44a0690:Packages/SookraShotKit/Tests/OCRKitTests/SensitiveContentDetectorTests.swift:generic-api-key:24
+# ^ synthetic API-key fixture in SensitiveContentDetectorTests (hand-verified fake, tests the redaction detector)
