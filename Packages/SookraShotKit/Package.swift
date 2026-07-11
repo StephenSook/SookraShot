@@ -29,10 +29,15 @@ let package = Package(
             dependencies.append(.product(name: "KeyboardShortcuts", package: "KeyboardShortcuts"))
         }
         if name == "QuickAccessKit" {
-            dependencies.append("ExportKit")
+            dependencies.append(contentsOf: ["ExportKit", "OCRKit"])
+        }
+        if name == "AnnotationKit" {
+            dependencies.append(contentsOf: ["ExportKit", "OCRKit"])
         }
         return .target(name: name, dependencies: dependencies)
     } + [
-        .testTarget(name: "SharedKitTests", dependencies: ["SharedKit"])
+        .testTarget(name: "SharedKitTests", dependencies: ["SharedKit"]),
+        .testTarget(name: "OCRKitTests", dependencies: ["OCRKit"]),
+        .testTarget(name: "AnnotationKitTests", dependencies: ["AnnotationKit"]),
     ]
 )
