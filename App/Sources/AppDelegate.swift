@@ -39,6 +39,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 } else {
                     coordinator.recordScreen()
                 }
+            case .scrollingCapture:
+                coordinator.scrollingCapture()
             }
         }
     }
@@ -59,6 +61,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 coordinator.recordDisplayUnderMouse(captureMicrophone: micRequested)
             case "stop-recording":
                 coordinator.stopRecording()
+            case "scrolling-capture":
+                coordinator.scrollingCapture()
             default:
                 NSLog("SookraShot: unhandled URL \(url.absoluteString)")
             }

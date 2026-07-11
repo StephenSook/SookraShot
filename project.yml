@@ -27,6 +27,7 @@ targets:
           - OCRKit
           - AnnotationKit
           - RecordingKit
+          - ScrollCaptureKit
     info:
       path: App/Info.plist
       properties:

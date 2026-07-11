@@ -12,6 +12,7 @@ extension KeyboardShortcuts.Name {
     public static let allInOne = Self("allInOne", default: .init(.five, modifiers: [.command, .shift]))
     public static let captureText = Self("captureText", default: .init(.two, modifiers: [.command, .shift]))
     public static let recordScreen = Self("recordScreen", default: .init(.six, modifiers: [.command, .shift]))
+    public static let scrollingCapture = Self("scrollingCapture", default: .init(.seven, modifiers: [.command, .shift]))
 }
 
 public enum HotkeyAction: CaseIterable, Sendable {
@@ -20,6 +21,7 @@ public enum HotkeyAction: CaseIterable, Sendable {
     case allInOne
     case captureText
     case recordScreen
+    case scrollingCapture
 
     var name: KeyboardShortcuts.Name {
         switch self {
@@ -28,6 +30,7 @@ public enum HotkeyAction: CaseIterable, Sendable {
         case .allInOne: .allInOne
         case .captureText: .captureText
         case .recordScreen: .recordScreen
+        case .scrollingCapture: .scrollingCapture
         }
     }
 }

@@ -5,6 +5,7 @@ import OCRKit
 import OverlayKit
 import QuickAccessKit
 import RecordingKit
+import ScrollCaptureKit
 import SharedKit
 
 /// Routes capture triggers (menu, hotkeys, URL scheme) through selection and capture.
@@ -15,6 +16,7 @@ final class CaptureCoordinator {
     private let quickAccess = QuickAccessController()
     private let recorder = ScreenRecorder()
     private var exportAsGIF = false
+    private var scrollSession: ScrollCaptureSession?
 
     var onRecordingStateChange: (@MainActor (Bool) -> Void)? {
         get { recorder.onStateChange }
@@ -26,6 +28,26 @@ final class CaptureCoordinator {
     init() {
         quickAccess.onAnnotate = { capture in
             AnnotationEditorWindowController.present(capture: capture)
+        }
+    }
+
+    // MARK: - Scrolling capture
+
+    /// Select a region, then capture-and-stitch while the user scrolls.
+    func scrollingCapture() {
+        guard !overlay.isActive, scrollSession == nil, !recorder.isRecording else { return }
+        Task { await runScrollCapture() }
+    }
+
+    private func runScrollCapture() async {
+        let result = await overlay.beginSelection()
+        guard case .area(let displayID, let rectInDisplay, let scale) = result else { return }
+        let session = ScrollCaptureSession()
+        scrollSession = session
+        let image = await session.run(displayID: displayID, rectInDisplay: rectInDisplay, scale: scale)
+        scrollSession = nil
+        if let image {
+            deliver(image, displayID: displayID)
         }
     }
 
