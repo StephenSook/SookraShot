@@ -34,11 +34,15 @@ let package = Package(
         if name == "AnnotationKit" {
             dependencies.append(contentsOf: ["ExportKit", "OCRKit"])
         }
+        if name == "ScrollCaptureKit" {
+            dependencies.append("CaptureKit")
+        }
         return .target(name: name, dependencies: dependencies)
     } + [
         .testTarget(name: "SharedKitTests", dependencies: ["SharedKit"]),
         .testTarget(name: "OCRKitTests", dependencies: ["OCRKit"]),
         .testTarget(name: "AnnotationKitTests", dependencies: ["AnnotationKit"]),
         .testTarget(name: "RecordingKitTests", dependencies: ["RecordingKit"]),
+        .testTarget(name: "ScrollCaptureKitTests", dependencies: ["ScrollCaptureKit"]),
     ]
 )
