@@ -39,5 +39,6 @@ let package = Package(
         .testTarget(name: "SharedKitTests", dependencies: ["SharedKit"]),
         .testTarget(name: "OCRKitTests", dependencies: ["OCRKit"]),
         .testTarget(name: "AnnotationKitTests", dependencies: ["AnnotationKit"]),
+        .testTarget(name: "RecordingKitTests", dependencies: ["RecordingKit"]),
     ]
 )
