@@ -10,6 +10,7 @@ final class CaptureCardView: NSView {
         case copyText
         case save
         case annotate
+        case pin
         case dismiss
     }
 
@@ -55,9 +56,10 @@ final class CaptureCardView: NSView {
         let copyTextButton = actionButton("textformat", "Copy text (OCR)", .copyText)
         let saveButton = actionButton("square.and.arrow.down", "Save", .save)
         let annotateButton = actionButton("pencil.tip.crop.circle", "Annotate", .annotate)
+        let pinButton = actionButton("pin", "Pin on top", .pin)
         let closeButton = actionButton("xmark", "Dismiss", .dismiss)
 
-        let buttons = NSStackView(views: [copyButton, copyTextButton, saveButton, annotateButton, NSView(), closeButton])
+        let buttons = NSStackView(views: [copyButton, copyTextButton, saveButton, annotateButton, pinButton, NSView(), closeButton])
         buttons.orientation = .horizontal
         buttons.spacing = 6
         buttons.translatesAutoresizingMaskIntoConstraints = false
@@ -107,6 +109,7 @@ final class CaptureCardView: NSView {
         case .copyText: button.action = #selector(copyTextTapped)
         case .save: button.action = #selector(saveTapped)
         case .annotate: button.action = #selector(annotateTapped)
+        case .pin: button.action = #selector(pinTapped)
         case .dismiss: button.action = #selector(dismissTapped)
         }
         return button
@@ -114,6 +117,7 @@ final class CaptureCardView: NSView {
 
     @objc private func copyTapped() { onAction(self, .copy) }
     @objc private func copyTextTapped() { onAction(self, .copyText) }
+    @objc private func pinTapped() { onAction(self, .pin) }
     @objc private func saveTapped() { onAction(self, .save) }
     @objc private func annotateTapped() { onAction(self, .annotate) }
     @objc private func dismissTapped() { onAction(self, .dismiss) }

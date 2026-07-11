@@ -12,6 +12,7 @@ public final class QuickAccessController {
     private let saver = CaptureSaver()
 
     public var onAnnotate: (@MainActor (DeliveredCapture) -> Void)?
+    public var onPin: (@MainActor (DeliveredCapture) -> Void)?
 
     public init() {}
 
@@ -42,6 +43,9 @@ public final class QuickAccessController {
             }
         case .annotate:
             onAnnotate?(card.capture)
+            remove(card)
+        case .pin:
+            onPin?(card.capture)
             remove(card)
         case .dismiss:
             remove(card)
