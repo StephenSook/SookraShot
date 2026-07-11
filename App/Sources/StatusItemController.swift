@@ -4,6 +4,7 @@ import AppKit
 final class StatusItemController: NSObject {
     private var statusItem: NSStatusItem?
     private let coordinator: CaptureCoordinator
+    private var isRecording = false
 
     init(coordinator: CaptureCoordinator) {
         self.coordinator = coordinator
@@ -21,16 +22,24 @@ final class StatusItemController: NSObject {
 
     private func installStatusItem() {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        statusItem = item
+        refreshAppearance()
+    }
+
+    func setRecording(_ recording: Bool) {
+        isRecording = recording
+        refreshAppearance()
+    }
+
+    private func refreshAppearance() {
+        guard let item = statusItem else { return }
         if let button = item.button {
-            let image = NSImage(
-                systemSymbolName: "camera.viewfinder",
-                accessibilityDescription: "SookraShot"
-            )
+            let symbol = isRecording ? "stop.circle.fill" : "camera.viewfinder"
+            let image = NSImage(systemSymbolName: symbol, accessibilityDescription: "SookraShot")
             image?.isTemplate = true
             button.image = image
         }
         item.menu = buildMenu()
-        statusItem = item
     }
 
     @objc private func screenParametersChanged() {
@@ -45,10 +54,18 @@ final class StatusItemController: NSObject {
 
         // No keyEquivalents here — global hotkeys own the shortcuts; menu
         // equivalents would double-fire when the app is active.
-        menu.addItem(actionItem("Capture Area", #selector(captureArea)))
-        menu.addItem(actionItem("Capture Fullscreen", #selector(captureFullscreen)))
-        menu.addItem(actionItem("Capture Text (OCR)", #selector(captureText)))
-        menu.addItem(.separator())
+        if isRecording {
+            menu.addItem(actionItem("Stop Recording", #selector(stopRecording)))
+            menu.addItem(.separator())
+        } else {
+            menu.addItem(actionItem("Capture Area", #selector(captureArea)))
+            menu.addItem(actionItem("Capture Fullscreen", #selector(captureFullscreen)))
+            menu.addItem(actionItem("Capture Text (OCR)", #selector(captureText)))
+            menu.addItem(.separator())
+            menu.addItem(actionItem("Record Screen", #selector(recordScreen)))
+            menu.addItem(actionItem("Record GIF", #selector(recordGIF)))
+            menu.addItem(.separator())
+        }
 
         if !ScreenRecordingPermission.granted {
             menu.addItem(actionItem("Grant Screen Recording Access…", #selector(openScreenRecordingSettings)))
@@ -81,6 +98,18 @@ final class StatusItemController: NSObject {
 
     @objc private func captureText() {
         coordinator.captureText()
+    }
+
+    @objc private func recordScreen() {
+        coordinator.recordScreen()
+    }
+
+    @objc private func recordGIF() {
+        coordinator.recordScreen(asGIF: true)
+    }
+
+    @objc private func stopRecording() {
+        coordinator.stopRecording()
     }
 
     @objc private func openScreenRecordingSettings() {

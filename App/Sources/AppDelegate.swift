@@ -18,7 +18,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         let coordinator = CaptureCoordinator()
         captureCoordinator = coordinator
-        statusItemController = StatusItemController(coordinator: coordinator)
+        let statusController = StatusItemController(coordinator: coordinator)
+        statusItemController = statusController
+        coordinator.onRecordingStateChange = { isRecording in
+            statusController.setRecording(isRecording)
+        }
         ScreenRecordingPermission.requestIfNeeded()
 
         hotkeyCenter.onActivate { action in
@@ -29,6 +33,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 coordinator.captureFullscreen()
             case .captureText:
                 coordinator.captureText()
+            case .recordScreen:
+                if coordinator.isRecording {
+                    coordinator.stopRecording()
+                } else {
+                    coordinator.recordScreen()
+                }
             }
         }
     }
@@ -43,6 +53,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 coordinator.captureFullscreen()
             case "capture-text":
                 coordinator.captureText()
+            case "record-screen":
+                let micRequested = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                    .queryItems?.contains { $0.name == "mic" && $0.value == "1" } ?? false
+                coordinator.recordDisplayUnderMouse(captureMicrophone: micRequested)
+            case "stop-recording":
+                coordinator.stopRecording()
             default:
                 NSLog("SookraShot: unhandled URL \(url.absoluteString)")
             }

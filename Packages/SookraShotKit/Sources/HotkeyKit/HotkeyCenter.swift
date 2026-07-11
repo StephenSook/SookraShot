@@ -11,6 +11,7 @@ extension KeyboardShortcuts.Name {
     public static let captureArea = Self("captureArea", default: .init(.four, modifiers: [.command, .shift]))
     public static let allInOne = Self("allInOne", default: .init(.five, modifiers: [.command, .shift]))
     public static let captureText = Self("captureText", default: .init(.two, modifiers: [.command, .shift]))
+    public static let recordScreen = Self("recordScreen", default: .init(.six, modifiers: [.command, .shift]))
 }
 
 public enum HotkeyAction: CaseIterable, Sendable {
@@ -18,6 +19,7 @@ public enum HotkeyAction: CaseIterable, Sendable {
     case captureArea
     case allInOne
     case captureText
+    case recordScreen
 
     var name: KeyboardShortcuts.Name {
         switch self {
@@ -25,6 +27,7 @@ public enum HotkeyAction: CaseIterable, Sendable {
         case .captureArea: .captureArea
         case .allInOne: .allInOne
         case .captureText: .captureText
+        case .recordScreen: .recordScreen
         }
     }
 }
