@@ -1,5 +1,6 @@
 import AppKit
 import ExportKit
+import OCRKit
 import SharedKit
 
 /// Owns the floating Quick Access panel: presents capture cards in the
@@ -29,6 +30,8 @@ public final class QuickAccessController {
         case .copy:
             PasteboardWriter.copy(card.capture)
             remove(card)
+        case .copyText:
+            copyRecognizedText(from: card)
         case .save:
             do {
                 try saver.save(card.capture)
@@ -42,6 +45,26 @@ public final class QuickAccessController {
             remove(card)
         case .dismiss:
             remove(card)
+        }
+    }
+
+    private func copyRecognizedText(from card: CaptureCardView) {
+        Task { @MainActor [weak self] in
+            do {
+                let recognized = try await TextRecognizer().recognizeText(in: card.capture.image)
+                let text = recognized.fullText
+                guard !text.isEmpty else {
+                    NSSound.beep()
+                    return
+                }
+                let pasteboard = NSPasteboard.general
+                pasteboard.clearContents()
+                pasteboard.setString(text, forType: .string)
+                self?.remove(card)
+            } catch {
+                NSLog("SookraShot OCR failed: \(error)")
+                NSSound.beep()
+            }
         }
     }
 

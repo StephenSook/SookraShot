@@ -47,6 +47,7 @@ final class StatusItemController: NSObject {
         // equivalents would double-fire when the app is active.
         menu.addItem(actionItem("Capture Area", #selector(captureArea)))
         menu.addItem(actionItem("Capture Fullscreen", #selector(captureFullscreen)))
+        menu.addItem(actionItem("Capture Text (OCR)", #selector(captureText)))
         menu.addItem(.separator())
 
         if !ScreenRecordingPermission.granted {
@@ -76,6 +77,10 @@ final class StatusItemController: NSObject {
 
     @objc private func captureFullscreen() {
         coordinator.captureFullscreen()
+    }
+
+    @objc private func captureText() {
+        coordinator.captureText()
     }
 
     @objc private func openScreenRecordingSettings() {

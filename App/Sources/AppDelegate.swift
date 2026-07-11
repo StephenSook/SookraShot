@@ -28,8 +28,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             case .captureFullscreen:
                 coordinator.captureFullscreen()
             case .captureText:
-                // OCR arrives in Phase 3; area capture until then.
-                coordinator.captureArea()
+                coordinator.captureText()
             }
         }
     }
@@ -42,6 +41,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 coordinator.captureArea()
             case "capture-fullscreen":
                 coordinator.captureFullscreen()
+            case "capture-text":
+                coordinator.captureText()
             default:
                 NSLog("SookraShot: unhandled URL \(url.absoluteString)")
             }

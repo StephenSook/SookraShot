@@ -24,6 +24,8 @@ targets:
           - HotkeyKit
           - QuickAccessKit
           - ExportKit
+          - OCRKit
+          - AnnotationKit
     info:
       path: App/Info.plist
       properties:

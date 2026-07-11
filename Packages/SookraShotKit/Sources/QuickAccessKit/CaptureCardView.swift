@@ -7,6 +7,7 @@ import SharedKit
 final class CaptureCardView: NSView {
     enum Action {
         case copy
+        case copyText
         case save
         case annotate
         case dismiss
@@ -51,11 +52,12 @@ final class CaptureCardView: NSView {
         let imageSize = thumbnailSize()
 
         let copyButton = actionButton("doc.on.doc", "Copy", .copy)
+        let copyTextButton = actionButton("textformat", "Copy text (OCR)", .copyText)
         let saveButton = actionButton("square.and.arrow.down", "Save", .save)
         let annotateButton = actionButton("pencil.tip.crop.circle", "Annotate", .annotate)
         let closeButton = actionButton("xmark", "Dismiss", .dismiss)
 
-        let buttons = NSStackView(views: [copyButton, saveButton, annotateButton, NSView(), closeButton])
+        let buttons = NSStackView(views: [copyButton, copyTextButton, saveButton, annotateButton, NSView(), closeButton])
         buttons.orientation = .horizontal
         buttons.spacing = 6
         buttons.translatesAutoresizingMaskIntoConstraints = false
@@ -102,6 +104,7 @@ final class CaptureCardView: NSView {
         button.target = self
         switch action {
         case .copy: button.action = #selector(copyTapped)
+        case .copyText: button.action = #selector(copyTextTapped)
         case .save: button.action = #selector(saveTapped)
         case .annotate: button.action = #selector(annotateTapped)
         case .dismiss: button.action = #selector(dismissTapped)
@@ -110,6 +113,7 @@ final class CaptureCardView: NSView {
     }
 
     @objc private func copyTapped() { onAction(self, .copy) }
+    @objc private func copyTextTapped() { onAction(self, .copyText) }
     @objc private func saveTapped() { onAction(self, .save) }
     @objc private func annotateTapped() { onAction(self, .annotate) }
     @objc private func dismissTapped() { onAction(self, .dismiss) }

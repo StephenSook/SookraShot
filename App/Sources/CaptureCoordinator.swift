@@ -1,5 +1,7 @@
+import AnnotationKit
 import AppKit
 import CaptureKit
+import OCRKit
 import OverlayKit
 import QuickAccessKit
 import SharedKit
@@ -11,9 +13,48 @@ final class CaptureCoordinator {
     private let overlay = SelectionOverlayController()
     private let quickAccess = QuickAccessController()
 
+    init() {
+        quickAccess.onAnnotate = { capture in
+            AnnotationEditorWindowController.present(capture: capture)
+        }
+    }
+
     func captureArea() {
         guard !overlay.isActive else { return }
         Task { await runAreaSelection() }
+    }
+
+    /// OCR flow: select region, recognize on-device, put text on the clipboard.
+    func captureText() {
+        guard !overlay.isActive else { return }
+        Task { await runCaptureText() }
+    }
+
+    private func runCaptureText() async {
+        let result = await overlay.beginSelection()
+        do {
+            let image: CGImage
+            switch result {
+            case .area(let displayID, let rectInDisplay, let scale):
+                image = try await capturer.captureRect(rectInDisplay, displayID: displayID, scale: scale)
+            case .window(let windowID, let scale):
+                image = try await capturer.captureWindow(windowID: windowID, scale: scale)
+            case .cancelled:
+                return
+            }
+            let recognized = try await TextRecognizer().recognizeText(in: image)
+            let text = recognized.fullText
+            guard !text.isEmpty else {
+                NSSound.beep()
+                return
+            }
+            let pasteboard = NSPasteboard.general
+            pasteboard.clearContents()
+            pasteboard.setString(text, forType: .string)
+        } catch {
+            NSLog("SookraShot capture text failed: \(error)")
+            NSSound.beep()
+        }
     }
 
     func captureFullscreen() {
