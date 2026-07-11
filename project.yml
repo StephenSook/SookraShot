@@ -22,6 +22,8 @@ targets:
           - CaptureKit
           - OverlayKit
           - HotkeyKit
+          - QuickAccessKit
+          - ExportKit
     info:
       path: App/Info.plist
       properties:
