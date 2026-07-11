@@ -37,6 +37,9 @@ let package = Package(
         if name == "ScrollCaptureKit" {
             dependencies.append("CaptureKit")
         }
+        if name == "PinKit" || name == "HistoryKit" {
+            dependencies.append("ExportKit")
+        }
         return .target(name: name, dependencies: dependencies)
     } + [
         .testTarget(name: "SharedKitTests", dependencies: ["SharedKit"]),
