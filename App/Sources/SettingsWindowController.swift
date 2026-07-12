@@ -62,6 +62,7 @@ private struct GeneralSettingsView: View {
     @AppStorage("beautifyFrame") private var beautifyFrame = BeautifyFrame.none.rawValue
     @AppStorage("smartFilenames") private var smartFilenames = false
     @AppStorage("captureDelaySeconds") private var captureDelaySeconds = 0
+    @AppStorage("autoScrollScrollingCapture") private var autoScrollScrollingCapture = false
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
 
     var body: some View {
@@ -87,6 +88,7 @@ private struct GeneralSettingsView: View {
                     Text("5 seconds").tag(5)
                     Text("10 seconds").tag(10)
                 }
+                Toggle("Auto-scroll during scrolling capture", isOn: $autoScrollScrollingCapture)
                 Picker("Thumbnail corner", selection: $overlayCorner) {
                     Text("Bottom Left").tag(OverlayCorner.bottomLeft.rawValue)
                     Text("Bottom Right").tag(OverlayCorner.bottomRight.rawValue)
