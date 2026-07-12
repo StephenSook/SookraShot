@@ -44,7 +44,11 @@ Thin AppKit shell in `App/`; all logic in `Packages/SookraShotKit` as independen
 
 ## Permissions
 
-Screen Recording (capture), Microphone (only if mic audio is enabled for recordings). Global hotkeys use Carbon `RegisterEventHotKey` and require no extra permissions.
+- **Screen Recording** — capturing pixels (ScreenCaptureKit).
+- **Accessibility** — the drag-to-select overlay uses a session-level `CGEvent` tap so the selection works over any app; macOS gates event taps behind Accessibility. Granted once, prompted on first area capture.
+- **Microphone** — only if mic audio is enabled for a recording.
+
+Global hotkeys use Carbon `RegisterEventHotKey` and need no extra permission. Sign with a stable identity (a free Apple Development cert) so the Screen Recording and Accessibility grants persist across rebuilds.
 
 ## License
 
