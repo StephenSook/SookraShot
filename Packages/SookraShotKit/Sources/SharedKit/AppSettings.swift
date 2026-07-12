@@ -50,6 +50,14 @@ public struct AppSettings: Sendable {
         defaults.bool(forKey: "addClickEffectsToRecordings")
     }
 
+    public var autoZoomRecordings: Bool {
+        defaults.bool(forKey: "autoZoomRecordings")
+    }
+
+    public var keystrokeOverlayRecordings: Bool {
+        defaults.bool(forKey: "keystrokeOverlayRecordings")
+    }
+
     public var beautifyBackground: String {
         defaults.string(forKey: "beautifyBackground") ?? "ocean"
     }

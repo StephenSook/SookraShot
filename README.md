@@ -28,7 +28,7 @@ Other conveniences: **Capture Previous Area** re-shoots the last region without 
 
 Recordings can be trimmed: pick **Trim a Video…** from the menu bar (or turn on "Open trim editor after recording" in Settings) to open a clip in the native QuickTime-style trim UI and export the selected range.
 
-Turn on **Add click ripples to recordings** in Settings to bake an animated highlight at every mouse click into display and area recordings (great for demo videos). Auto-zoom to the cursor and a keystroke overlay are planned follow-ups.
+Three demo-video effects can be baked into display and area recordings (Settings > General): **click ripples** (an animated highlight at each click), **auto-zoom to cursor** (the video eases in toward click activity and pans between clicks), and a **keystroke overlay** (typed keys shown as a caption, e.g. `⌘⇧A`). All are captured with the Accessibility grant already used for area selection — no extra permission.
 
 ## Ask Claude
 
@@ -52,7 +52,7 @@ Two more buttons on the Quick Access thumbnail:
 
 ## Roadmap
 
-Recording auto-zoom to cursor + keystroke overlay.
+Every planned feature has shipped. Ideas welcome.
 
 ## Build
 
