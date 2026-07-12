@@ -16,12 +16,19 @@ Default shortcuts (remap in Settings; disable the system ones in System Settings
 | Cmd+Shift+2 | Capture text (OCR to clipboard) |
 | Cmd+Shift+6 | Record screen (press again to stop) |
 | Cmd+Shift+7 | Scrolling capture |
+| Cmd+Shift+8 | Ask Claude about a selected region |
 
-URL scheme: `sookrashot://capture-area`, `capture-fullscreen`, `capture-text`, `record-screen` (`?mic=1`), `stop-recording`, `scrolling-capture` — usable from Raycast, Shortcuts, or scripts.
+URL scheme: `sookrashot://capture-area`, `capture-fullscreen`, `capture-text`, `record-screen` (`?mic=1`), `stop-recording`, `scrolling-capture`, `ask-claude` — usable from Raycast, Shortcuts, or scripts.
+
+## Ask Claude
+
+Send any capture to Claude and get an answer in a floating panel: **explain / fix an error** from a screenshot of a terminal or stack trace, **extract it as Markdown**, turn a **screenshot into code** (SwiftUI or HTML), or **describe / translate / ask anything**. Trigger it with Cmd+Shift+8 (select a region), the sparkles button on a capture thumbnail, or `sookrashot://ask-claude`; a follow-up field lets you ask arbitrary questions about the same image.
+
+Uses the Anthropic Messages API with Claude Fable 5 (falls back to Claude Opus 4.8 if a request is declined). Paste an [Anthropic API key](https://console.anthropic.com/settings/keys) in Settings > Ask Claude the first time; it is stored only in your macOS Keychain. Claude Fable 5 requires standard (non-zero) data retention on your Anthropic org.
 
 ## Roadmap
 
-Self-timer, capture-previous-area, window-with-background beautify, recording trim editor, auto-scroll for scrolling capture (needs Accessibility permission), smart OCR filenames, send-to-Claude, background removal, color sampler, Liquid Glass (`NSGlassEffectView`) panel styling.
+Self-timer, capture-previous-area, window-with-background beautify, recording trim editor, auto-scroll for scrolling capture (needs Accessibility permission), smart OCR filenames, cloud share to Backblaze B2, background removal, color sampler, Liquid Glass (`NSGlassEffectView`) panel styling.
 
 ## Build
 
@@ -40,13 +47,15 @@ swift test --package-path Packages/SookraShotKit
 
 ## Architecture
 
-Thin AppKit shell in `App/`; all logic in `Packages/SookraShotKit` as independent modules (CaptureKit, OverlayKit, QuickAccessKit, AnnotationKit, OCRKit, RecordingKit, ScrollCaptureKit, HotkeyKit, HistoryKit, PinKit, ExportKit, SharedKit).
+Thin AppKit shell in `App/`; all logic in `Packages/SookraShotKit` as independent modules (CaptureKit, OverlayKit, QuickAccessKit, AnnotationKit, OCRKit, RecordingKit, ScrollCaptureKit, HotkeyKit, HistoryKit, PinKit, ExportKit, AIKit, SharedKit).
 
 ## Permissions
 
 - **Screen Recording** — capturing pixels (ScreenCaptureKit).
 - **Accessibility** — the drag-to-select overlay uses a session-level `CGEvent` tap so the selection works over any app; macOS gates event taps behind Accessibility. Granted once, prompted on first area capture.
 - **Microphone** — only if mic audio is enabled for a recording.
+
+Ask Claude is the only feature that touches the network: it sends the selected capture to the Anthropic API over HTTPS. Everything else is fully local.
 
 Global hotkeys use Carbon `RegisterEventHotKey` and need no extra permission. Sign with a stable identity (a free Apple Development cert) so the Screen Recording and Accessibility grants persist across rebuilds.
 

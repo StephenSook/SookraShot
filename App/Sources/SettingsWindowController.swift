@@ -1,3 +1,4 @@
+import AIKit
 import AppKit
 import HotkeyKit
 import ServiceManagement
@@ -40,6 +41,8 @@ private struct SettingsRootView: View {
                 .tabItem { Label("General", systemImage: "gearshape") }
             HotkeySettingsView()
                 .tabItem { Label("Shortcuts", systemImage: "keyboard") }
+            AISettingsView()
+                .tabItem { Label("Ask Claude", systemImage: "sparkles") }
         }
         .frame(width: 500, height: 380)
     }
@@ -117,5 +120,49 @@ private struct GeneralSettingsView: View {
         if panel.runModal() == .OK, let url = panel.url {
             saveDirectoryPath = url.path
         }
+    }
+}
+
+private struct AISettingsView: View {
+    @State private var hasKey = KeychainStore.hasKey
+    @State private var keyDraft = ""
+
+    var body: some View {
+        Form {
+            Section("Anthropic API key") {
+                if hasKey {
+                    LabeledContent("Status") {
+                        Label("A key is saved in your Keychain", systemImage: "checkmark.seal")
+                            .foregroundStyle(.green)
+                    }
+                    Button("Remove Key", role: .destructive) {
+                        KeychainStore.deleteAPIKey()
+                        hasKey = false
+                    }
+                } else {
+                    SecureField("sk-ant-…", text: $keyDraft)
+                        .onSubmit(saveKey)
+                    Button("Save Key") { saveKey() }
+                        .disabled(keyDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+                Link("Get a key at console.anthropic.com", destination: URL(string: "https://console.anthropic.com/settings/keys")!)
+            }
+            Section {
+                Text("Ask Claude (Cmd+Shift+8, the sparkles button on a thumbnail, or sookrashot://ask-claude) sends the capture to Claude Fable 5 to explain errors, extract Markdown, turn a screenshot into code, or answer any question about it. The key is stored only in your macOS Keychain.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                Text("Claude Fable 5 requires standard (non-zero) data retention on your Anthropic org.")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        .formStyle(.grouped)
+        .padding(4)
+    }
+
+    private func saveKey() {
+        KeychainStore.setAPIKey(keyDraft)
+        hasKey = KeychainStore.hasKey
+        keyDraft = ""
     }
 }

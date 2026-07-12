@@ -1,3 +1,4 @@
+import AIKit
 import AnnotationKit
 import AppKit
 import CaptureKit
@@ -21,6 +22,7 @@ final class CaptureCoordinator {
     private var scrollSession: ScrollCaptureSession?
     private let pins = PinController()
     private let history = HistoryStore()
+    private let askClaudePanel = AskClaudePanelController()
 
     var onRecordingStateChange: (@MainActor (Bool) -> Void)? {
         get { recorder.onStateChange }
@@ -35,6 +37,9 @@ final class CaptureCoordinator {
         }
         quickAccess.onPin = { [weak self] capture in
             self?.pins.pin(capture)
+        }
+        quickAccess.onAskClaude = { [weak self] capture in
+            self?.askClaude(about: capture)
         }
     }
 
@@ -162,6 +167,46 @@ final class CaptureCoordinator {
     func captureArea() {
         guard !overlay.isActive else { return }
         Task { await runAreaSelection() }
+    }
+
+    // MARK: - Ask Claude
+
+    /// Open the Ask Claude answer panel for an existing capture.
+    func askClaude(about capture: DeliveredCapture) {
+        askClaudePanel.present(capture)
+    }
+
+    /// Select a region, then open the Ask Claude panel for it.
+    func askClaudeArea() {
+        guard !overlay.isActive else { return }
+        Task { await runAskClaudeArea() }
+    }
+
+    private func runAskClaudeArea() async {
+        let result = await overlay.beginSelection()
+        do {
+            let image: CGImage
+            let displayID: CGDirectDisplayID?
+            switch result {
+            case .area(let id, let rectInDisplay, let scale):
+                image = try await capturer.captureRect(rectInDisplay, displayID: id, scale: scale)
+                displayID = id
+            case .window(let windowID, let scale):
+                image = try await capturer.captureWindow(windowID: windowID, scale: scale)
+                displayID = screenUnderMouse()?.displayID
+            case .permissionRequired:
+                showAccessibilityAlert()
+                return
+            case .cancelled:
+                return
+            }
+            let capture = DeliveredCapture(image: image, displayID: displayID)
+            history.record(capture)
+            askClaude(about: capture)
+        } catch {
+            NSLog("SookraShot ask-claude capture failed: \(error)")
+            NSSound.beep()
+        }
     }
 
     /// OCR flow: select region, recognize on-device, put text on the clipboard.

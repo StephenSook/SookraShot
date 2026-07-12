@@ -32,6 +32,7 @@ targets:
           - ScrollCaptureKit
           - PinKit
           - HistoryKit
+          - AIKit
     info:
       path: App/Info.plist
       properties:

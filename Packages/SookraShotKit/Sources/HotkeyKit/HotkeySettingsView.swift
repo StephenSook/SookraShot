@@ -13,6 +13,7 @@ public struct HotkeySettingsView: View {
             KeyboardShortcuts.Recorder("Capture Text (OCR)", name: .captureText)
             KeyboardShortcuts.Recorder("Record Screen", name: .recordScreen)
             KeyboardShortcuts.Recorder("Scrolling Capture", name: .scrollingCapture)
+            KeyboardShortcuts.Recorder("Ask Claude", name: .askClaude)
         }
         .padding(20)
     }

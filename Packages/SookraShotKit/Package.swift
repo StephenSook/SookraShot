@@ -14,6 +14,7 @@ let modules = [
     "HistoryKit",
     "PinKit",
     "ExportKit",
+    "AIKit",
 ]
 
 let package = Package(

@@ -13,6 +13,7 @@ public final class QuickAccessController {
 
     public var onAnnotate: (@MainActor (DeliveredCapture) -> Void)?
     public var onPin: (@MainActor (DeliveredCapture) -> Void)?
+    public var onAskClaude: (@MainActor (DeliveredCapture) -> Void)?
 
     public init() {}
 
@@ -44,6 +45,9 @@ public final class QuickAccessController {
         case .annotate:
             onAnnotate?(card.capture)
             remove(card)
+        case .askClaude:
+            // Leave the card up — the answer panel is a separate surface.
+            onAskClaude?(card.capture)
         case .pin:
             onPin?(card.capture)
             remove(card)

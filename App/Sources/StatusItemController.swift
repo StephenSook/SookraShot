@@ -62,6 +62,7 @@ final class StatusItemController: NSObject {
             menu.addItem(actionItem("Capture Fullscreen", #selector(captureFullscreen)))
             menu.addItem(actionItem("Capture Text (OCR)", #selector(captureText)))
             menu.addItem(actionItem("Scrolling Capture", #selector(scrollingCapture)))
+            menu.addItem(actionItem("Ask Claude About a Capture", #selector(askClaude)))
             menu.addItem(.separator())
             menu.addItem(actionItem("Record Screen", #selector(recordScreen)))
             menu.addItem(actionItem("Record GIF", #selector(recordGIF)))
@@ -111,6 +112,10 @@ final class StatusItemController: NSObject {
 
     @objc private func scrollingCapture() {
         coordinator.scrollingCapture()
+    }
+
+    @objc private func askClaude() {
+        coordinator.askClaudeArea()
     }
 
     @objc private func recordGIF() {
