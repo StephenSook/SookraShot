@@ -11,6 +11,7 @@ import QuickAccessKit
 import RecordingKit
 import ScrollCaptureKit
 import SharedKit
+import UniformTypeIdentifiers
 
 /// Routes capture triggers (menu, hotkeys, URL scheme) through selection and capture.
 @MainActor
@@ -117,7 +118,11 @@ final class CaptureCoordinator {
                 let tempURL = try await recorder.stop()
                 let destination = try await finalizeRecording(tempURL: tempURL)
                 NSLog("SookraShot recording saved: \(destination.path)")
-                NSWorkspace.shared.activateFileViewerSelecting([destination])
+                if AppSettings.shared.openTrimEditorAfterRecording, destination.pathExtension == "mp4" {
+                    TrimEditorWindowController.present(url: destination)
+                } else {
+                    NSWorkspace.shared.activateFileViewerSelecting([destination])
+                }
             } catch {
                 NSLog("SookraShot recording stop failed: \(error)")
                 NSSound.beep()
@@ -145,6 +150,20 @@ final class CaptureCoordinator {
         } catch {
             NSLog("SookraShot recording start failed: \(error)")
             NSSound.beep()
+        }
+    }
+
+    /// Pick a video file and open it in the trim editor.
+    func openTrimEditor() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = false
+        panel.allowedContentTypes = [.movie, .mpeg4Movie, .quickTimeMovie]
+        panel.directoryURL = AppSettings.shared.saveDirectory
+        panel.prompt = "Trim"
+        if panel.runModal() == .OK, let url = panel.url {
+            TrimEditorWindowController.present(url: url)
         }
     }
 

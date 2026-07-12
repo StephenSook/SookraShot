@@ -41,4 +41,8 @@ public struct AppSettings: Sendable {
     public var filenameTemplate: FilenameTemplate {
         defaults.string(forKey: "filenameTemplate").map(FilenameTemplate.init(pattern:)) ?? .default
     }
+
+    public var openTrimEditorAfterRecording: Bool {
+        defaults.bool(forKey: "openTrimEditorAfterRecording")
+    }
 }

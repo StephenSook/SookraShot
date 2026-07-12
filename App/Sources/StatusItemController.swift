@@ -67,6 +67,7 @@ final class StatusItemController: NSObject {
             menu.addItem(.separator())
             menu.addItem(actionItem("Record Screen", #selector(recordScreen)))
             menu.addItem(actionItem("Record GIF", #selector(recordGIF)))
+            menu.addItem(actionItem("Trim a Video…", #selector(trimVideo)))
             menu.addItem(.separator())
         }
 
@@ -125,6 +126,10 @@ final class StatusItemController: NSObject {
 
     @objc private func recordGIF() {
         coordinator.recordScreen(asGIF: true)
+    }
+
+    @objc private func trimVideo() {
+        coordinator.openTrimEditor()
     }
 
     @objc private func stopRecording() {
