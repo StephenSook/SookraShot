@@ -21,6 +21,8 @@ Default shortcuts (remap in Settings; disable the system ones in System Settings
 
 URL scheme: `sookrashot://capture-area`, `capture-fullscreen`, `capture-text`, `record-screen` (`?mic=1`), `stop-recording`, `scrolling-capture`, `ask-claude`, `cloud-share` — usable from Raycast, Shortcuts, or scripts.
 
+Recordings can be trimmed: pick **Trim a Video…** from the menu bar (or turn on "Open trim editor after recording" in Settings) to open a clip in the native QuickTime-style trim UI and export the selected range.
+
 ## Ask Claude
 
 Send any capture to Claude and get an answer in a floating panel: **explain / fix an error** from a screenshot of a terminal or stack trace, **extract it as Markdown**, turn a **screenshot into code** (SwiftUI or HTML), or **describe / translate / ask anything**. Trigger it with Cmd+Shift+8 (select a region), the sparkles button on a capture thumbnail, or `sookrashot://ask-claude`; a follow-up field lets you ask arbitrary questions about the same image.
@@ -35,7 +37,7 @@ B2's S3-compatible API is signed with AWS Signature V4 (all local, no third-part
 
 ## Roadmap
 
-Self-timer, capture-previous-area, window-with-background beautify, recording trim editor, auto-scroll for scrolling capture (needs Accessibility permission), smart OCR filenames, background removal, color sampler, Liquid Glass (`NSGlassEffectView`) panel styling.
+Self-timer, capture-previous-area, window-with-background beautify, recording auto-zoom to cursor + click ripples + keystroke overlay, auto-scroll for scrolling capture (needs Accessibility permission), smart OCR filenames, background removal, color sampler, Liquid Glass (`NSGlassEffectView`) panel styling.
 
 ## Build
 

@@ -55,6 +55,7 @@ private struct GeneralSettingsView: View {
     @AppStorage("imageFormat") private var imageFormat = ImageFormat.png.rawValue
     @AppStorage("overlayCorner") private var overlayCorner = OverlayCorner.bottomLeft.rawValue
     @AppStorage("saveDirectoryPath") private var saveDirectoryPath = ""
+    @AppStorage("openTrimEditorAfterRecording") private var openTrimEditorAfterRecording = false
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
 
     var body: some View {
@@ -79,6 +80,7 @@ private struct GeneralSettingsView: View {
                     Text("Top Left").tag(OverlayCorner.topLeft.rawValue)
                     Text("Top Right").tag(OverlayCorner.topRight.rawValue)
                 }
+                Toggle("Open trim editor after recording", isOn: $openTrimEditorAfterRecording)
             }
             Section {
                 Toggle("Launch at login", isOn: $launchAtLogin)
