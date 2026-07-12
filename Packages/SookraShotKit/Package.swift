@@ -16,6 +16,7 @@ let modules = [
     "ExportKit",
     "AIKit",
     "CloudShareKit",
+    "BeautifyKit",
 ]
 
 let package = Package(
@@ -31,7 +32,7 @@ let package = Package(
             dependencies.append(.product(name: "KeyboardShortcuts", package: "KeyboardShortcuts"))
         }
         if name == "QuickAccessKit" {
-            dependencies.append(contentsOf: ["ExportKit", "OCRKit"])
+            dependencies.append(contentsOf: ["ExportKit", "OCRKit", "BeautifyKit"])
         }
         if name == "AnnotationKit" {
             dependencies.append(contentsOf: ["ExportKit", "OCRKit"])
@@ -50,5 +51,6 @@ let package = Package(
         .testTarget(name: "RecordingKitTests", dependencies: ["RecordingKit"]),
         .testTarget(name: "ScrollCaptureKitTests", dependencies: ["ScrollCaptureKit"]),
         .testTarget(name: "CloudShareKitTests", dependencies: ["CloudShareKit"]),
+        .testTarget(name: "BeautifyKitTests", dependencies: ["BeautifyKit"]),
     ]
 )
