@@ -45,4 +45,8 @@ public struct AppSettings: Sendable {
     public var openTrimEditorAfterRecording: Bool {
         defaults.bool(forKey: "openTrimEditorAfterRecording")
     }
+
+    public var addClickEffectsToRecordings: Bool {
+        defaults.bool(forKey: "addClickEffectsToRecordings")
+    }
 }
