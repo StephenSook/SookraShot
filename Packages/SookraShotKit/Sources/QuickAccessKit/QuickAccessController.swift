@@ -51,6 +51,8 @@ public final class QuickAccessController {
             onShareLink?(card.capture)
         case .beautify:
             beautify(card)
+        case .removeBackground:
+            removeBackground(from: card)
         case .safeShare:
             safeShare(from: card)
         case .pin:
@@ -70,6 +72,21 @@ public final class QuickAccessController {
         }
         // Present the beautified result as a new card so the original stays.
         present(DeliveredCapture(image: image, displayID: card.capture.displayID))
+    }
+
+    private func removeBackground(from card: CaptureCardView) {
+        Task { @MainActor [weak self] in
+            do {
+                guard let cutout = try await BackgroundRemover().removeBackground(from: card.capture.image) else {
+                    NSSound.beep()
+                    return
+                }
+                self?.present(DeliveredCapture(image: cutout, displayID: card.capture.displayID))
+            } catch {
+                NSLog("SookraShot background removal failed: \(error)")
+                NSSound.beep()
+            }
+        }
     }
 
     private func safeShare(from card: CaptureCardView) {

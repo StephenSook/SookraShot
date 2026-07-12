@@ -14,6 +14,7 @@ final class CaptureCardView: NSView {
         case askClaude
         case shareLink
         case beautify
+        case removeBackground
         case safeShare
         case pin
         case dismiss
@@ -61,11 +62,12 @@ final class CaptureCardView: NSView {
         let askClaudeButton = actionButton("sparkles", "Ask Claude", .askClaude)
         let shareLinkButton = actionButton("link", "Upload & copy link", .shareLink)
         let beautifyButton = actionButton("wand.and.stars", "Beautify", .beautify)
+        let removeBackgroundButton = actionButton("person.and.background.dotted", "Remove background", .removeBackground)
         let safeShareButton = actionButton("eye.slash", "Redact & copy", .safeShare)
         let pinButton = actionButton("pin", "Pin on top", .pin)
         let closeButton = actionButton("xmark", "Dismiss", .dismiss)
 
-        let buttons = NSStackView(views: [copyButton, copyTextButton, copyMarkdownButton, saveButton, annotateButton, askClaudeButton, shareLinkButton, beautifyButton, safeShareButton, pinButton, NSView(), closeButton])
+        let buttons = NSStackView(views: [copyButton, copyTextButton, copyMarkdownButton, saveButton, annotateButton, askClaudeButton, shareLinkButton, beautifyButton, removeBackgroundButton, safeShareButton, pinButton, NSView(), closeButton])
         buttons.orientation = .horizontal
         buttons.spacing = 6
         buttons.translatesAutoresizingMaskIntoConstraints = false
@@ -119,6 +121,7 @@ final class CaptureCardView: NSView {
         case .askClaude: button.action = #selector(askClaudeTapped)
         case .shareLink: button.action = #selector(shareLinkTapped)
         case .beautify: button.action = #selector(beautifyTapped)
+        case .removeBackground: button.action = #selector(removeBackgroundTapped)
         case .safeShare: button.action = #selector(safeShareTapped)
         case .pin: button.action = #selector(pinTapped)
         case .dismiss: button.action = #selector(dismissTapped)
@@ -135,6 +138,7 @@ final class CaptureCardView: NSView {
     @objc private func askClaudeTapped() { onAction(self, .askClaude) }
     @objc private func shareLinkTapped() { onAction(self, .shareLink) }
     @objc private func beautifyTapped() { onAction(self, .beautify) }
+    @objc private func removeBackgroundTapped() { onAction(self, .removeBackground) }
     @objc private func safeShareTapped() { onAction(self, .safeShare) }
     @objc private func dismissTapped() { onAction(self, .dismiss) }
 }
