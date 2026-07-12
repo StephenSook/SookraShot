@@ -1,5 +1,6 @@
 import AIKit
 import AppKit
+import CloudShareKit
 import HotkeyKit
 import ServiceManagement
 import SharedKit
@@ -43,6 +44,8 @@ private struct SettingsRootView: View {
                 .tabItem { Label("Shortcuts", systemImage: "keyboard") }
             AISettingsView()
                 .tabItem { Label("Ask Claude", systemImage: "sparkles") }
+            CloudShareSettingsView()
+                .tabItem { Label("Cloud Share", systemImage: "link") }
         }
         .frame(width: 500, height: 380)
     }
@@ -164,5 +167,67 @@ private struct AISettingsView: View {
         KeychainStore.setAPIKey(keyDraft)
         hasKey = KeychainStore.hasKey
         keyDraft = ""
+    }
+}
+
+private struct CloudShareSettingsView: View {
+    @AppStorage(B2Settings.Key.bucket) private var bucket = ""
+    @AppStorage(B2Settings.Key.region) private var region = ""
+    @AppStorage(B2Settings.Key.linkMode) private var linkMode = B2LinkMode.presigned.rawValue
+    @AppStorage(B2Settings.Key.presignedHours) private var presignedHours = 168
+
+    @State private var hasCredentials = B2CredentialStore.hasCredentials
+    @State private var keyIDDraft = ""
+    @State private var appKeyDraft = ""
+
+    var body: some View {
+        Form {
+            Section("Backblaze B2 credentials") {
+                if hasCredentials {
+                    LabeledContent("Status") {
+                        Label("Application key saved in your Keychain", systemImage: "checkmark.seal")
+                            .foregroundStyle(.green)
+                    }
+                    Button("Remove Credentials", role: .destructive) {
+                        B2CredentialStore.clear()
+                        hasCredentials = false
+                    }
+                } else {
+                    TextField("Key ID", text: $keyIDDraft)
+                    SecureField("Application Key", text: $appKeyDraft)
+                    Button("Save Credentials") { saveCredentials() }
+                        .disabled(keyIDDraft.trimmingCharacters(in: .whitespaces).isEmpty
+                            || appKeyDraft.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+            }
+            Section("Bucket") {
+                TextField("Bucket name", text: $bucket)
+                TextField("Region (e.g. us-west-004)", text: $region)
+                Picker("Link type", selection: $linkMode) {
+                    Text("Presigned (private bucket)").tag(B2LinkMode.presigned.rawValue)
+                    Text("Public URL (public bucket)").tag(B2LinkMode.publicURL.rawValue)
+                }
+                if linkMode == B2LinkMode.presigned.rawValue {
+                    Stepper("Link expires after \(presignedHours) h", value: $presignedHours, in: 1...720, step: 24)
+                }
+            }
+            Section {
+                Text("Share as Link (Cmd+Shift+9, the link button on a thumbnail, or sookrashot://cloud-share) uploads a capture to your B2 bucket over the S3-compatible API and copies the link. Credentials are stored only in your macOS Keychain.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                Text("The region is the one in your bucket's S3 endpoint (s3.<region>.backblazeb2.com).")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        .formStyle(.grouped)
+        .padding(4)
+    }
+
+    private func saveCredentials() {
+        B2CredentialStore.set(keyID: keyIDDraft, appKey: appKeyDraft)
+        hasCredentials = B2CredentialStore.hasCredentials
+        keyIDDraft = ""
+        appKeyDraft = ""
     }
 }

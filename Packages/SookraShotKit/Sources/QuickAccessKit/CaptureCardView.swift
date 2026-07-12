@@ -11,6 +11,7 @@ final class CaptureCardView: NSView {
         case save
         case annotate
         case askClaude
+        case shareLink
         case pin
         case dismiss
     }
@@ -58,10 +59,11 @@ final class CaptureCardView: NSView {
         let saveButton = actionButton("square.and.arrow.down", "Save", .save)
         let annotateButton = actionButton("pencil.tip.crop.circle", "Annotate", .annotate)
         let askClaudeButton = actionButton("sparkles", "Ask Claude", .askClaude)
+        let shareLinkButton = actionButton("link", "Upload & copy link", .shareLink)
         let pinButton = actionButton("pin", "Pin on top", .pin)
         let closeButton = actionButton("xmark", "Dismiss", .dismiss)
 
-        let buttons = NSStackView(views: [copyButton, copyTextButton, saveButton, annotateButton, askClaudeButton, pinButton, NSView(), closeButton])
+        let buttons = NSStackView(views: [copyButton, copyTextButton, saveButton, annotateButton, askClaudeButton, shareLinkButton, pinButton, NSView(), closeButton])
         buttons.orientation = .horizontal
         buttons.spacing = 6
         buttons.translatesAutoresizingMaskIntoConstraints = false
@@ -112,6 +114,7 @@ final class CaptureCardView: NSView {
         case .save: button.action = #selector(saveTapped)
         case .annotate: button.action = #selector(annotateTapped)
         case .askClaude: button.action = #selector(askClaudeTapped)
+        case .shareLink: button.action = #selector(shareLinkTapped)
         case .pin: button.action = #selector(pinTapped)
         case .dismiss: button.action = #selector(dismissTapped)
         }
@@ -124,5 +127,6 @@ final class CaptureCardView: NSView {
     @objc private func saveTapped() { onAction(self, .save) }
     @objc private func annotateTapped() { onAction(self, .annotate) }
     @objc private func askClaudeTapped() { onAction(self, .askClaude) }
+    @objc private func shareLinkTapped() { onAction(self, .shareLink) }
     @objc private func dismissTapped() { onAction(self, .dismiss) }
 }

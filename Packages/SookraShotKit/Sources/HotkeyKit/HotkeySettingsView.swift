@@ -14,6 +14,7 @@ public struct HotkeySettingsView: View {
             KeyboardShortcuts.Recorder("Record Screen", name: .recordScreen)
             KeyboardShortcuts.Recorder("Scrolling Capture", name: .scrollingCapture)
             KeyboardShortcuts.Recorder("Ask Claude", name: .askClaude)
+            KeyboardShortcuts.Recorder("Share as Link (B2)", name: .cloudShare)
         }
         .padding(20)
     }

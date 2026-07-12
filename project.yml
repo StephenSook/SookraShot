@@ -33,6 +33,7 @@ targets:
           - PinKit
           - HistoryKit
           - AIKit
+          - CloudShareKit
     info:
       path: App/Info.plist
       properties:

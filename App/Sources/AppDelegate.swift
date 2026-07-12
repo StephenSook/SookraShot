@@ -43,6 +43,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 coordinator.scrollingCapture()
             case .askClaude:
                 coordinator.askClaudeArea()
+            case .cloudShare:
+                coordinator.shareToCloudArea()
             }
         }
     }
@@ -67,6 +69,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 coordinator.scrollingCapture()
             case "ask-claude":
                 coordinator.askClaudeArea()
+            case "cloud-share":
+                coordinator.shareToCloudArea()
             default:
                 NSLog("SookraShot: unhandled URL \(url.absoluteString)")
             }

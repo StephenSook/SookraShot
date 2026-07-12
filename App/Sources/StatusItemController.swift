@@ -63,6 +63,7 @@ final class StatusItemController: NSObject {
             menu.addItem(actionItem("Capture Text (OCR)", #selector(captureText)))
             menu.addItem(actionItem("Scrolling Capture", #selector(scrollingCapture)))
             menu.addItem(actionItem("Ask Claude About a Capture", #selector(askClaude)))
+            menu.addItem(actionItem("Share Capture as Link", #selector(shareToCloud)))
             menu.addItem(.separator())
             menu.addItem(actionItem("Record Screen", #selector(recordScreen)))
             menu.addItem(actionItem("Record GIF", #selector(recordGIF)))
@@ -116,6 +117,10 @@ final class StatusItemController: NSObject {
 
     @objc private func askClaude() {
         coordinator.askClaudeArea()
+    }
+
+    @objc private func shareToCloud() {
+        coordinator.shareToCloudArea()
     }
 
     @objc private func recordGIF() {
