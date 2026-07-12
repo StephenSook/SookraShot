@@ -12,6 +12,8 @@ final class CaptureCardView: NSView {
         case annotate
         case askClaude
         case shareLink
+        case beautify
+        case safeShare
         case pin
         case dismiss
     }
@@ -60,10 +62,12 @@ final class CaptureCardView: NSView {
         let annotateButton = actionButton("pencil.tip.crop.circle", "Annotate", .annotate)
         let askClaudeButton = actionButton("sparkles", "Ask Claude", .askClaude)
         let shareLinkButton = actionButton("link", "Upload & copy link", .shareLink)
+        let beautifyButton = actionButton("wand.and.stars", "Beautify", .beautify)
+        let safeShareButton = actionButton("eye.slash", "Redact & copy", .safeShare)
         let pinButton = actionButton("pin", "Pin on top", .pin)
         let closeButton = actionButton("xmark", "Dismiss", .dismiss)
 
-        let buttons = NSStackView(views: [copyButton, copyTextButton, saveButton, annotateButton, askClaudeButton, shareLinkButton, pinButton, NSView(), closeButton])
+        let buttons = NSStackView(views: [copyButton, copyTextButton, saveButton, annotateButton, askClaudeButton, shareLinkButton, beautifyButton, safeShareButton, pinButton, NSView(), closeButton])
         buttons.orientation = .horizontal
         buttons.spacing = 6
         buttons.translatesAutoresizingMaskIntoConstraints = false
@@ -115,6 +119,8 @@ final class CaptureCardView: NSView {
         case .annotate: button.action = #selector(annotateTapped)
         case .askClaude: button.action = #selector(askClaudeTapped)
         case .shareLink: button.action = #selector(shareLinkTapped)
+        case .beautify: button.action = #selector(beautifyTapped)
+        case .safeShare: button.action = #selector(safeShareTapped)
         case .pin: button.action = #selector(pinTapped)
         case .dismiss: button.action = #selector(dismissTapped)
         }
@@ -128,5 +134,7 @@ final class CaptureCardView: NSView {
     @objc private func annotateTapped() { onAction(self, .annotate) }
     @objc private func askClaudeTapped() { onAction(self, .askClaude) }
     @objc private func shareLinkTapped() { onAction(self, .shareLink) }
+    @objc private func beautifyTapped() { onAction(self, .beautify) }
+    @objc private func safeShareTapped() { onAction(self, .safeShare) }
     @objc private func dismissTapped() { onAction(self, .dismiss) }
 }

@@ -37,6 +37,13 @@ Upload a capture to your own Backblaze B2 bucket and get a link on the clipboard
 
 B2's S3-compatible API is signed with AWS Signature V4 (all local, no third-party SDK). In Settings > Cloud Share, add your B2 application key ID + key (stored in the Keychain), the bucket name, and the region from the bucket's S3 endpoint (`s3.<region>.backblazeb2.com`). Links are presigned with a configurable expiry by default, or plain public URLs if the bucket is public.
 
+## Beautify and safe share
+
+Two more buttons on the Quick Access thumbnail:
+
+- **Beautify** composites the capture onto a padded gradient background with a shadow and rounded corners, for social/chat posts. Pick the gradient in Settings > General.
+- **Redact & copy** (safe share) runs OCR to find secrets and PII (API keys, emails, tokens, card numbers) plus faces, blacks those regions out, and copies the redacted image. All on-device.
+
 ## Roadmap
 
 Self-timer, capture-previous-area, window-with-background beautify, recording auto-zoom to cursor + keystroke overlay, auto-scroll for scrolling capture (needs Accessibility permission), smart OCR filenames, background removal, color sampler, Liquid Glass (`NSGlassEffectView`) panel styling.
@@ -58,7 +65,7 @@ swift test --package-path Packages/SookraShotKit
 
 ## Architecture
 
-Thin AppKit shell in `App/`; all logic in `Packages/SookraShotKit` as independent modules (CaptureKit, OverlayKit, QuickAccessKit, AnnotationKit, OCRKit, RecordingKit, ScrollCaptureKit, HotkeyKit, HistoryKit, PinKit, ExportKit, AIKit, CloudShareKit, SharedKit).
+Thin AppKit shell in `App/`; all logic in `Packages/SookraShotKit` as independent modules (CaptureKit, OverlayKit, QuickAccessKit, AnnotationKit, OCRKit, RecordingKit, ScrollCaptureKit, HotkeyKit, HistoryKit, PinKit, ExportKit, AIKit, CloudShareKit, BeautifyKit, SharedKit).
 
 ## Permissions
 

@@ -1,4 +1,5 @@
 import AppKit
+import BeautifyKit
 import ExportKit
 import OCRKit
 import SharedKit
@@ -52,11 +53,39 @@ public final class QuickAccessController {
         case .shareLink:
             // Leave the card up — the upload HUD is a separate surface.
             onShareLink?(card.capture)
+        case .beautify:
+            beautify(card)
+        case .safeShare:
+            safeShare(from: card)
         case .pin:
             onPin?(card.capture)
             remove(card)
         case .dismiss:
             remove(card)
+        }
+    }
+
+    private func beautify(_ card: CaptureCardView) {
+        let background = BeautifyBackground(rawValue: AppSettings.shared.beautifyBackground) ?? .ocean
+        guard let image = Beautifier().beautify(card.capture.image, background: background) else {
+            NSSound.beep()
+            return
+        }
+        // Present the beautified result as a new card so the original stays.
+        present(DeliveredCapture(image: image, displayID: card.capture.displayID))
+    }
+
+    private func safeShare(from card: CaptureCardView) {
+        Task { @MainActor [weak self] in
+            do {
+                let result = try await SafeShareRedactor().redact(card.capture.image)
+                let redacted = DeliveredCapture(image: result.image, displayID: card.capture.displayID)
+                PasteboardWriter.copy(redacted)
+                self?.remove(card)
+            } catch {
+                NSLog("SookraShot safe share failed: \(error)")
+                NSSound.beep()
+            }
         }
     }
 

@@ -49,4 +49,8 @@ public struct AppSettings: Sendable {
     public var addClickEffectsToRecordings: Bool {
         defaults.bool(forKey: "addClickEffectsToRecordings")
     }
+
+    public var beautifyBackground: String {
+        defaults.string(forKey: "beautifyBackground") ?? "ocean"
+    }
 }

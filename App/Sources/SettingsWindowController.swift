@@ -1,5 +1,6 @@
 import AIKit
 import AppKit
+import BeautifyKit
 import CloudShareKit
 import HotkeyKit
 import ServiceManagement
@@ -57,6 +58,7 @@ private struct GeneralSettingsView: View {
     @AppStorage("saveDirectoryPath") private var saveDirectoryPath = ""
     @AppStorage("openTrimEditorAfterRecording") private var openTrimEditorAfterRecording = false
     @AppStorage("addClickEffectsToRecordings") private var addClickEffectsToRecordings = false
+    @AppStorage("beautifyBackground") private var beautifyBackground = BeautifyBackground.ocean.rawValue
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
 
     var body: some View {
@@ -83,6 +85,11 @@ private struct GeneralSettingsView: View {
                 }
                 Toggle("Open trim editor after recording", isOn: $openTrimEditorAfterRecording)
                 Toggle("Add click ripples to recordings", isOn: $addClickEffectsToRecordings)
+                Picker("Beautify background", selection: $beautifyBackground) {
+                    ForEach(BeautifyBackground.allCases, id: \.rawValue) { background in
+                        Text(background.title).tag(background.rawValue)
+                    }
+                }
             }
             Section {
                 Toggle("Launch at login", isOn: $launchAtLogin)
