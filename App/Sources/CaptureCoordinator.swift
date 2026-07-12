@@ -26,6 +26,9 @@ final class CaptureCoordinator {
     private let history = HistoryStore()
     private let askClaudePanel = AskClaudePanelController()
     private let cloudShareHUD = CloudShareHUDController()
+    private let inputMonitor = RecordingInputMonitor()
+    private let enhancer = RecordingEnhancer()
+    private var effectsMapping: RecordingEnhancer.Mapping?
 
     var onRecordingStateChange: (@MainActor (Bool) -> Void)? {
         get { recorder.onStateChange }
@@ -98,12 +101,11 @@ final class CaptureCoordinator {
         guard !recorder.isRecording else { return }
         guard let screen = screenUnderMouse(), let displayID = screen.displayID else { return }
         exportAsGIF = false
+        let target = RecordingTarget.display(displayID, scale: screen.backingScaleFactor)
+        beginEffectsCapture(for: target)
         Task {
             do {
-                try await recorder.start(
-                    target: .display(displayID, scale: screen.backingScaleFactor),
-                    captureMicrophone: captureMicrophone
-                )
+                try await recorder.start(target: target, captureMicrophone: captureMicrophone)
             } catch {
                 NSLog("SookraShot recording start failed: \(error)")
                 NSSound.beep()
@@ -145,11 +147,41 @@ final class CaptureCoordinator {
             return
         }
         exportAsGIF = asGIF
+        if !asGIF { beginEffectsCapture(for: target) }
         do {
             try await recorder.start(target: target)
         } catch {
             NSLog("SookraShot recording start failed: \(error)")
             NSSound.beep()
+        }
+    }
+
+    // MARK: - Click effects
+
+    /// Start capturing clicks for post-recording ripples, when enabled and the
+    /// target has a stable coordinate mapping (display or area, not a window).
+    private func beginEffectsCapture(for target: RecordingTarget) {
+        guard AppSettings.shared.addClickEffectsToRecordings,
+              let mapping = mappingContext(for: target) else {
+            effectsMapping = nil
+            return
+        }
+        effectsMapping = mapping
+        inputMonitor.start()
+    }
+
+    private func mappingContext(for target: RecordingTarget) -> RecordingEnhancer.Mapping? {
+        switch target {
+        case .display(let displayID, _):
+            guard let screen = NSScreen.screens.first(where: { $0.displayID == displayID }) else { return nil }
+            return RecordingEnhancer.Mapping(regionOriginGlobal: screen.frame.origin, regionSizeGlobal: screen.frame.size)
+        case .area(let displayID, let rect, _):
+            guard let screen = NSScreen.screens.first(where: { $0.displayID == displayID }) else { return nil }
+            // rect is display-local top-left points; convert to a global bottom-left region.
+            let originBL = CGPoint(x: screen.frame.minX + rect.minX, y: screen.frame.maxY - rect.maxY)
+            return RecordingEnhancer.Mapping(regionOriginGlobal: originBL, regionSizeGlobal: rect.size)
+        case .window:
+            return nil
         }
     }
 
@@ -170,12 +202,32 @@ final class CaptureCoordinator {
     private func finalizeRecording(tempURL: URL) async throws -> URL {
         let settings = AppSettings.shared
         let base = settings.filenameTemplate.filename(for: Date())
+
+        // Always drain the click monitor if it was started, so it never leaks.
+        let clickLog = effectsMapping != nil ? inputMonitor.stop() : nil
+        let mapping = effectsMapping
+        effectsMapping = nil
+
         if exportAsGIF {
             let destination = uniqueURL(base: base, ext: "gif", in: settings.saveDirectory)
             try await GIFExporter().exportGIF(from: tempURL, to: destination)
             try? FileManager.default.removeItem(at: tempURL)
             return destination
         }
+
+        if let mapping, let clickLog, !clickLog.clicks.isEmpty {
+            do {
+                let enhanced = try await enhancer.enhance(
+                    source: tempURL, clicks: clickLog.clicks, mapping: mapping,
+                    toDirectory: settings.saveDirectory, baseName: base
+                )
+                try? FileManager.default.removeItem(at: tempURL)
+                return enhanced
+            } catch {
+                NSLog("SookraShot recording enhance failed, saving raw: \(error)")
+            }
+        }
+
         let destination = uniqueURL(base: base, ext: "mp4", in: settings.saveDirectory)
         try FileManager.default.moveItem(at: tempURL, to: destination)
         return destination

@@ -56,6 +56,7 @@ private struct GeneralSettingsView: View {
     @AppStorage("overlayCorner") private var overlayCorner = OverlayCorner.bottomLeft.rawValue
     @AppStorage("saveDirectoryPath") private var saveDirectoryPath = ""
     @AppStorage("openTrimEditorAfterRecording") private var openTrimEditorAfterRecording = false
+    @AppStorage("addClickEffectsToRecordings") private var addClickEffectsToRecordings = false
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
 
     var body: some View {
@@ -81,6 +82,7 @@ private struct GeneralSettingsView: View {
                     Text("Top Right").tag(OverlayCorner.topRight.rawValue)
                 }
                 Toggle("Open trim editor after recording", isOn: $openTrimEditorAfterRecording)
+                Toggle("Add click ripples to recordings", isOn: $addClickEffectsToRecordings)
             }
             Section {
                 Toggle("Launch at login", isOn: $launchAtLogin)
