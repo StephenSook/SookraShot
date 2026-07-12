@@ -21,6 +21,18 @@ import UniformTypeIdentifiers
         #expect(FileManager.default.fileExists(atPath: previewURL.path))
     }
 
+    @Test func rendersWindowAndBrowserFrames() throws {
+        let source = Self.makeTestImage(width: 600, height: 380)
+        for frame in [BeautifyFrame.macWindow, .browser] {
+            let output = try #require(Beautifier().beautify(source, background: .graphite, frame: frame))
+            // Frame adds chrome height above the image.
+            #expect(output.height > 380 + Int(600.0 * 0.09) * 2)
+            let url = FileManager.default.temporaryDirectory.appendingPathComponent("sookrashot-frame-\(frame.rawValue).png")
+            try Self.writePNG(output, to: url)
+            #expect(FileManager.default.fileExists(atPath: url.path))
+        }
+    }
+
     private static func makeTestImage(width: Int, height: Int) -> CGImage {
         let context = CGContext(
             data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 0,

@@ -63,7 +63,8 @@ public final class QuickAccessController {
 
     private func beautify(_ card: CaptureCardView) {
         let background = BeautifyBackground(rawValue: AppSettings.shared.beautifyBackground) ?? .ocean
-        guard let image = Beautifier().beautify(card.capture.image, background: background) else {
+        let frame = BeautifyFrame(rawValue: AppSettings.shared.beautifyFrame) ?? .none
+        guard let image = Beautifier().beautify(card.capture.image, background: background, frame: frame) else {
             NSSound.beep()
             return
         }

@@ -54,6 +54,10 @@ public struct AppSettings: Sendable {
         defaults.string(forKey: "beautifyBackground") ?? "ocean"
     }
 
+    public var beautifyFrame: String {
+        defaults.string(forKey: "beautifyFrame") ?? "none"
+    }
+
     public var smartFilenames: Bool {
         defaults.bool(forKey: "smartFilenames")
     }
