@@ -15,6 +15,7 @@ let modules = [
     "PinKit",
     "ExportKit",
     "AIKit",
+    "CloudShareKit",
 ]
 
 let package = Package(
@@ -38,7 +39,7 @@ let package = Package(
         if name == "ScrollCaptureKit" {
             dependencies.append("CaptureKit")
         }
-        if name == "PinKit" || name == "HistoryKit" {
+        if name == "PinKit" || name == "HistoryKit" || name == "CloudShareKit" {
             dependencies.append("ExportKit")
         }
         return .target(name: name, dependencies: dependencies)
@@ -48,5 +49,6 @@ let package = Package(
         .testTarget(name: "AnnotationKitTests", dependencies: ["AnnotationKit"]),
         .testTarget(name: "RecordingKitTests", dependencies: ["RecordingKit"]),
         .testTarget(name: "ScrollCaptureKitTests", dependencies: ["ScrollCaptureKit"]),
+        .testTarget(name: "CloudShareKitTests", dependencies: ["CloudShareKit"]),
     ]
 )

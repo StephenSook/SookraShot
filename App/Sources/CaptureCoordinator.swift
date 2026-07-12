@@ -2,6 +2,7 @@ import AIKit
 import AnnotationKit
 import AppKit
 import CaptureKit
+import CloudShareKit
 import OCRKit
 import HistoryKit
 import OverlayKit
@@ -23,6 +24,7 @@ final class CaptureCoordinator {
     private let pins = PinController()
     private let history = HistoryStore()
     private let askClaudePanel = AskClaudePanelController()
+    private let cloudShareHUD = CloudShareHUDController()
 
     var onRecordingStateChange: (@MainActor (Bool) -> Void)? {
         get { recorder.onStateChange }
@@ -40,6 +42,12 @@ final class CaptureCoordinator {
         }
         quickAccess.onAskClaude = { [weak self] capture in
             self?.askClaude(about: capture)
+        }
+        quickAccess.onShareLink = { [weak self] capture in
+            self?.shareToCloud(about: capture)
+        }
+        cloudShareHUD.onOpenSettings = {
+            SettingsWindowController.present()
         }
     }
 
@@ -205,6 +213,46 @@ final class CaptureCoordinator {
             askClaude(about: capture)
         } catch {
             NSLog("SookraShot ask-claude capture failed: \(error)")
+            NSSound.beep()
+        }
+    }
+
+    // MARK: - Cloud share
+
+    /// Upload an existing capture to Backblaze B2 and show the link HUD.
+    func shareToCloud(about capture: DeliveredCapture) {
+        cloudShareHUD.present(capture)
+    }
+
+    /// Select a region, then upload it to Backblaze B2.
+    func shareToCloudArea() {
+        guard !overlay.isActive else { return }
+        Task { await runShareToCloudArea() }
+    }
+
+    private func runShareToCloudArea() async {
+        let result = await overlay.beginSelection()
+        do {
+            let image: CGImage
+            let displayID: CGDirectDisplayID?
+            switch result {
+            case .area(let id, let rectInDisplay, let scale):
+                image = try await capturer.captureRect(rectInDisplay, displayID: id, scale: scale)
+                displayID = id
+            case .window(let windowID, let scale):
+                image = try await capturer.captureWindow(windowID: windowID, scale: scale)
+                displayID = screenUnderMouse()?.displayID
+            case .permissionRequired:
+                showAccessibilityAlert()
+                return
+            case .cancelled:
+                return
+            }
+            let capture = DeliveredCapture(image: image, displayID: displayID)
+            history.record(capture)
+            shareToCloud(about: capture)
+        } catch {
+            NSLog("SookraShot cloud-share capture failed: \(error)")
             NSSound.beep()
         }
     }
