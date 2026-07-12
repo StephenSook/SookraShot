@@ -2,7 +2,9 @@ import AppKit
 import ExportKit
 import SharedKit
 
-/// One capture card: thumbnail plus Copy / Save / Annotate / dismiss actions.
+/// One capture card: thumbnail plus the core Copy / Save / Annotate / Pin
+/// actions, with the rest tucked into a "More" (⋯) menu so the toolbar stays
+/// uncluttered.
 @MainActor
 final class CaptureCardView: NSView {
     enum Action {
@@ -22,6 +24,7 @@ final class CaptureCardView: NSView {
 
     let capture: DeliveredCapture
     private let onAction: @MainActor (CaptureCardView, Action) -> Void
+    private var overflowMenu: NSMenu?
 
     private static let maxThumbnailWidth: CGFloat = 320
     private static let maxThumbnailHeight: CGFloat = 220
@@ -54,20 +57,15 @@ final class CaptureCardView: NSView {
 
         let imageSize = thumbnailSize()
 
+        // Core actions inline; everything else lives in the ⋯ menu.
         let copyButton = actionButton("doc.on.doc", "Copy", .copy)
-        let copyTextButton = actionButton("textformat", "Copy text (OCR)", .copyText)
-        let copyMarkdownButton = actionButton("chevron.left.forwardslash.chevron.right", "Copy as Markdown code", .copyMarkdown)
         let saveButton = actionButton("square.and.arrow.down", "Save", .save)
         let annotateButton = actionButton("pencil.tip.crop.circle", "Annotate", .annotate)
-        let askClaudeButton = actionButton("sparkles", "Ask Claude", .askClaude)
-        let shareLinkButton = actionButton("link", "Upload & copy link", .shareLink)
-        let beautifyButton = actionButton("wand.and.stars", "Beautify", .beautify)
-        let removeBackgroundButton = actionButton("person.and.background.dotted", "Remove background", .removeBackground)
-        let safeShareButton = actionButton("eye.slash", "Redact & copy", .safeShare)
+        let moreButton = overflowButton()
         let pinButton = actionButton("pin", "Pin on top", .pin)
         let closeButton = actionButton("xmark", "Dismiss", .dismiss)
 
-        let buttons = NSStackView(views: [copyButton, copyTextButton, copyMarkdownButton, saveButton, annotateButton, askClaudeButton, shareLinkButton, beautifyButton, removeBackgroundButton, safeShareButton, pinButton, NSView(), closeButton])
+        let buttons = NSStackView(views: [copyButton, saveButton, annotateButton, moreButton, pinButton, NSView(), closeButton])
         buttons.orientation = .horizontal
         buttons.spacing = 6
         buttons.translatesAutoresizingMaskIntoConstraints = false
@@ -114,31 +112,58 @@ final class CaptureCardView: NSView {
         button.target = self
         switch action {
         case .copy: button.action = #selector(copyTapped)
-        case .copyText: button.action = #selector(copyTextTapped)
-        case .copyMarkdown: button.action = #selector(copyMarkdownTapped)
         case .save: button.action = #selector(saveTapped)
         case .annotate: button.action = #selector(annotateTapped)
-        case .askClaude: button.action = #selector(askClaudeTapped)
-        case .shareLink: button.action = #selector(shareLinkTapped)
-        case .beautify: button.action = #selector(beautifyTapped)
-        case .removeBackground: button.action = #selector(removeBackgroundTapped)
-        case .safeShare: button.action = #selector(safeShareTapped)
         case .pin: button.action = #selector(pinTapped)
         case .dismiss: button.action = #selector(dismissTapped)
+        default: break
         }
         return button
     }
 
+    private func overflowButton() -> NSButton {
+        let menu = NSMenu()
+        addMenuItem(to: menu, "Copy text (OCR)", .copyText)
+        addMenuItem(to: menu, "Copy as Markdown code", .copyMarkdown)
+        menu.addItem(.separator())
+        addMenuItem(to: menu, "Ask Claude", .askClaude)
+        addMenuItem(to: menu, "Upload & copy link", .shareLink)
+        menu.addItem(.separator())
+        addMenuItem(to: menu, "Beautify", .beautify)
+        addMenuItem(to: menu, "Remove background", .removeBackground)
+        addMenuItem(to: menu, "Redact & copy (safe share)", .safeShare)
+        overflowMenu = menu
+
+        let button = NSButton()
+        button.bezelStyle = .accessoryBarAction
+        button.isBordered = true
+        button.title = ""
+        button.image = NSImage(systemSymbolName: "ellipsis", accessibilityDescription: "More actions")
+        button.toolTip = "More actions"
+        button.target = self
+        button.action = #selector(overflowTapped(_:))
+        return button
+    }
+
+    private func addMenuItem(to menu: NSMenu, _ title: String, _ action: Action) {
+        let item = NSMenuItem(title: title, action: #selector(overflowSelected(_:)), keyEquivalent: "")
+        item.target = self
+        item.representedObject = action
+        menu.addItem(item)
+    }
+
+    @objc private func overflowTapped(_ sender: NSButton) {
+        overflowMenu?.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.maxY + 4), in: sender)
+    }
+
+    @objc private func overflowSelected(_ sender: NSMenuItem) {
+        guard let action = sender.representedObject as? Action else { return }
+        onAction(self, action)
+    }
+
     @objc private func copyTapped() { onAction(self, .copy) }
-    @objc private func copyTextTapped() { onAction(self, .copyText) }
-    @objc private func copyMarkdownTapped() { onAction(self, .copyMarkdown) }
-    @objc private func pinTapped() { onAction(self, .pin) }
     @objc private func saveTapped() { onAction(self, .save) }
     @objc private func annotateTapped() { onAction(self, .annotate) }
-    @objc private func askClaudeTapped() { onAction(self, .askClaude) }
-    @objc private func shareLinkTapped() { onAction(self, .shareLink) }
-    @objc private func beautifyTapped() { onAction(self, .beautify) }
-    @objc private func removeBackgroundTapped() { onAction(self, .removeBackground) }
-    @objc private func safeShareTapped() { onAction(self, .safeShare) }
+    @objc private func pinTapped() { onAction(self, .pin) }
     @objc private func dismissTapped() { onAction(self, .dismiss) }
 }
