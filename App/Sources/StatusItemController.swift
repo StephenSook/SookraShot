@@ -59,11 +59,13 @@ final class StatusItemController: NSObject {
             menu.addItem(.separator())
         } else {
             menu.addItem(actionItem("Capture Area", #selector(captureArea)))
+            menu.addItem(actionItem("Capture Previous Area", #selector(capturePreviousArea)))
             menu.addItem(actionItem("Capture Fullscreen", #selector(captureFullscreen)))
             menu.addItem(actionItem("Capture Text (OCR)", #selector(captureText)))
             menu.addItem(actionItem("Scrolling Capture", #selector(scrollingCapture)))
             menu.addItem(actionItem("Ask Claude About a Capture", #selector(askClaude)))
             menu.addItem(actionItem("Share Capture as Link", #selector(shareToCloud)))
+            menu.addItem(actionItem("Sample Color (hex)", #selector(sampleColor)))
             menu.addItem(.separator())
             menu.addItem(actionItem("Record Screen", #selector(recordScreen)))
             menu.addItem(actionItem("Record GIF", #selector(recordGIF)))
@@ -98,6 +100,14 @@ final class StatusItemController: NSObject {
 
     @objc private func captureArea() {
         coordinator.captureArea()
+    }
+
+    @objc private func capturePreviousArea() {
+        coordinator.capturePreviousArea()
+    }
+
+    @objc private func sampleColor() {
+        coordinator.sampleColor()
     }
 
     @objc private func captureFullscreen() {

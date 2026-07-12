@@ -18,8 +18,11 @@ Default shortcuts (remap in Settings; disable the system ones in System Settings
 | Cmd+Shift+7 | Scrolling capture |
 | Cmd+Shift+8 | Ask Claude about a selected region |
 | Cmd+Shift+9 | Share a selected region as a link (Backblaze B2) |
+| Cmd+Shift+0 | Sample a screen color (copies hex) |
 
-URL scheme: `sookrashot://capture-area`, `capture-fullscreen`, `capture-text`, `record-screen` (`?mic=1`), `stop-recording`, `scrolling-capture`, `ask-claude`, `cloud-share` — usable from Raycast, Shortcuts, or scripts.
+URL scheme: `sookrashot://capture-area`, `capture-fullscreen`, `capture-text`, `record-screen` (`?mic=1`), `stop-recording`, `scrolling-capture`, `ask-claude`, `cloud-share`, `sample-color`, `capture-previous-area` — usable from Raycast, Shortcuts, or scripts.
+
+Other conveniences: **Capture Previous Area** re-shoots the last region without the overlay; a **self-timer** (Settings > General) delays a fullscreen capture; **Copy as Markdown code** on a thumbnail wraps the OCR'd text in a fenced code block; and turning on **Name saved files from their text** derives filenames from a capture's content. The Quick Access panel uses macOS 26 Liquid Glass.
 
 Recordings can be trimmed: pick **Trim a Video…** from the menu bar (or turn on "Open trim editor after recording" in Settings) to open a clip in the native QuickTime-style trim UI and export the selected range.
 
@@ -46,7 +49,7 @@ Two more buttons on the Quick Access thumbnail:
 
 ## Roadmap
 
-Self-timer, capture-previous-area, window-with-background beautify, recording auto-zoom to cursor + keystroke overlay, auto-scroll for scrolling capture (needs Accessibility permission), smart OCR filenames, background removal, color sampler, Liquid Glass (`NSGlassEffectView`) panel styling.
+Device/browser frame for beautify, recording auto-zoom to cursor + keystroke overlay, auto-scroll for scrolling capture (needs Accessibility permission), background removal (`VNGenerateForegroundInstanceMaskRequest`).
 
 ## Build
 

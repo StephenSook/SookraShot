@@ -35,15 +35,11 @@ public final class QuickAccessController {
             PasteboardWriter.copy(card.capture)
             remove(card)
         case .copyText:
-            copyRecognizedText(from: card)
+            copyRecognizedText(from: card, asMarkdown: false)
+        case .copyMarkdown:
+            copyRecognizedText(from: card, asMarkdown: true)
         case .save:
-            do {
-                try saver.save(card.capture)
-                remove(card)
-            } catch {
-                NSLog("SookraShot save failed: \(error)")
-                NSSound.beep()
-            }
+            saveCapture(card)
         case .annotate:
             onAnnotate?(card.capture)
             remove(card)
@@ -89,7 +85,7 @@ public final class QuickAccessController {
         }
     }
 
-    private func copyRecognizedText(from card: CaptureCardView) {
+    private func copyRecognizedText(from card: CaptureCardView, asMarkdown: Bool) {
         Task { @MainActor [weak self] in
             do {
                 let recognized = try await TextRecognizer().recognizeText(in: card.capture.image)
@@ -98,12 +94,31 @@ public final class QuickAccessController {
                     NSSound.beep()
                     return
                 }
+                let output = asMarkdown ? "```\n\(text)\n```" : text
                 let pasteboard = NSPasteboard.general
                 pasteboard.clearContents()
-                pasteboard.setString(text, forType: .string)
+                pasteboard.setString(output, forType: .string)
                 self?.remove(card)
             } catch {
                 NSLog("SookraShot OCR failed: \(error)")
+                NSSound.beep()
+            }
+        }
+    }
+
+    private func saveCapture(_ card: CaptureCardView) {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            do {
+                var baseName: String?
+                if AppSettings.shared.smartFilenames,
+                   let recognized = try? await TextRecognizer().recognizeText(in: card.capture.image) {
+                    baseName = SmartFilename.suggest(from: recognized)
+                }
+                try self.saver.save(card.capture, baseName: baseName)
+                self.remove(card)
+            } catch {
+                NSLog("SookraShot save failed: \(error)")
                 NSSound.beep()
             }
         }

@@ -29,6 +29,7 @@ final class CaptureCoordinator {
     private let inputMonitor = RecordingInputMonitor()
     private let enhancer = RecordingEnhancer()
     private var effectsMapping: RecordingEnhancer.Mapping?
+    private var lastArea: (displayID: CGDirectDisplayID, rect: CGRect, scale: CGFloat)?
 
     var onRecordingStateChange: (@MainActor (Bool) -> Void)? {
         get { recorder.onStateChange }
@@ -368,11 +369,46 @@ final class CaptureCoordinator {
         Task { await runFullscreen() }
     }
 
+    /// Re-capture the last selected area without showing the overlay again.
+    func capturePreviousArea() {
+        guard let last = lastArea, !overlay.isActive else {
+            NSSound.beep()
+            return
+        }
+        Task {
+            do {
+                let image = try await capturer.captureRect(last.rect, displayID: last.displayID, scale: last.scale)
+                deliver(image, displayID: last.displayID)
+            } catch {
+                NSLog("SookraShot capture previous area failed: \(error)")
+                NSSound.beep()
+            }
+        }
+    }
+
+    /// Native eyedropper: pick a screen pixel and copy its hex to the clipboard.
+    func sampleColor() {
+        NSColorSampler().show { color in
+            Task { @MainActor in
+                guard let color = color?.usingColorSpace(.sRGB) else { return }
+                let hex = HexColor.string(
+                    red: Double(color.redComponent),
+                    green: Double(color.greenComponent),
+                    blue: Double(color.blueComponent)
+                )
+                let pasteboard = NSPasteboard.general
+                pasteboard.clearContents()
+                pasteboard.setString(hex, forType: .string)
+            }
+        }
+    }
+
     private func runAreaSelection() async {
         let result = await overlay.beginSelection()
         do {
             switch result {
             case .area(let displayID, let rectInDisplay, let scale):
+                lastArea = (displayID, rectInDisplay, scale)
                 let image = try await capturer.captureRect(rectInDisplay, displayID: displayID, scale: scale)
                 deliver(image, displayID: displayID)
             case .window(let windowID, let scale):
@@ -391,6 +427,8 @@ final class CaptureCoordinator {
 
     private func runFullscreen() async {
         guard let screen = screenUnderMouse(), let displayID = screen.displayID else { return }
+        let delay = AppSettings.shared.captureDelaySeconds
+        if delay > 0 { try? await Task.sleep(for: .seconds(delay)) }
         do {
             let image = try await capturer.captureDisplay(displayID, scale: screen.backingScaleFactor)
             deliver(image, displayID: displayID)

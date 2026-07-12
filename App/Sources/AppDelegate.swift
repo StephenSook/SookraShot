@@ -45,6 +45,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 coordinator.askClaudeArea()
             case .cloudShare:
                 coordinator.shareToCloudArea()
+            case .sampleColor:
+                coordinator.sampleColor()
             }
         }
     }
@@ -71,6 +73,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 coordinator.askClaudeArea()
             case "cloud-share":
                 coordinator.shareToCloudArea()
+            case "sample-color":
+                coordinator.sampleColor()
+            case "capture-previous-area":
+                coordinator.capturePreviousArea()
             default:
                 NSLog("SookraShot: unhandled URL \(url.absoluteString)")
             }

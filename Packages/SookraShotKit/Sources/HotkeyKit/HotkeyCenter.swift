@@ -15,6 +15,7 @@ extension KeyboardShortcuts.Name {
     public static let scrollingCapture = Self("scrollingCapture", default: .init(.seven, modifiers: [.command, .shift]))
     public static let askClaude = Self("askClaude", default: .init(.eight, modifiers: [.command, .shift]))
     public static let cloudShare = Self("cloudShare", default: .init(.nine, modifiers: [.command, .shift]))
+    public static let sampleColor = Self("sampleColor", default: .init(.zero, modifiers: [.command, .shift]))
 }
 
 public enum HotkeyAction: CaseIterable, Sendable {
@@ -26,6 +27,7 @@ public enum HotkeyAction: CaseIterable, Sendable {
     case scrollingCapture
     case askClaude
     case cloudShare
+    case sampleColor
 
     var name: KeyboardShortcuts.Name {
         switch self {
@@ -37,6 +39,7 @@ public enum HotkeyAction: CaseIterable, Sendable {
         case .scrollingCapture: .scrollingCapture
         case .askClaude: .askClaude
         case .cloudShare: .cloudShare
+        case .sampleColor: .sampleColor
         }
     }
 }
