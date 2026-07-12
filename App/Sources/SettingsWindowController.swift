@@ -59,6 +59,7 @@ private struct GeneralSettingsView: View {
     @AppStorage("openTrimEditorAfterRecording") private var openTrimEditorAfterRecording = false
     @AppStorage("addClickEffectsToRecordings") private var addClickEffectsToRecordings = false
     @AppStorage("beautifyBackground") private var beautifyBackground = BeautifyBackground.ocean.rawValue
+    @AppStorage("beautifyFrame") private var beautifyFrame = BeautifyFrame.none.rawValue
     @AppStorage("smartFilenames") private var smartFilenames = false
     @AppStorage("captureDelaySeconds") private var captureDelaySeconds = 0
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
@@ -97,6 +98,11 @@ private struct GeneralSettingsView: View {
                 Picker("Beautify background", selection: $beautifyBackground) {
                     ForEach(BeautifyBackground.allCases, id: \.rawValue) { background in
                         Text(background.title).tag(background.rawValue)
+                    }
+                }
+                Picker("Beautify frame", selection: $beautifyFrame) {
+                    ForEach(BeautifyFrame.allCases, id: \.rawValue) { frame in
+                        Text(frame.title).tag(frame.rawValue)
                     }
                 }
             }

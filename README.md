@@ -44,12 +44,12 @@ B2's S3-compatible API is signed with AWS Signature V4 (all local, no third-part
 
 Two more buttons on the Quick Access thumbnail:
 
-- **Beautify** composites the capture onto a padded gradient background with a shadow and rounded corners, for social/chat posts. Pick the gradient in Settings > General.
+- **Beautify** composites the capture onto a padded gradient background with a shadow and rounded corners, for social/chat posts. Pick the gradient and an optional macOS-window or browser frame in Settings > General.
 - **Redact & copy** (safe share) runs OCR to find secrets and PII (API keys, emails, tokens, card numbers) plus faces, blacks those regions out, and copies the redacted image. All on-device.
 
 ## Roadmap
 
-Device/browser frame for beautify, recording auto-zoom to cursor + keystroke overlay, auto-scroll for scrolling capture (needs Accessibility permission), background removal (`VNGenerateForegroundInstanceMaskRequest`).
+Recording auto-zoom to cursor + keystroke overlay.
 
 ## Build
 
