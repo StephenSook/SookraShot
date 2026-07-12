@@ -58,6 +58,8 @@ private struct GeneralSettingsView: View {
     @AppStorage("saveDirectoryPath") private var saveDirectoryPath = ""
     @AppStorage("openTrimEditorAfterRecording") private var openTrimEditorAfterRecording = false
     @AppStorage("addClickEffectsToRecordings") private var addClickEffectsToRecordings = false
+    @AppStorage("autoZoomRecordings") private var autoZoomRecordings = false
+    @AppStorage("keystrokeOverlayRecordings") private var keystrokeOverlayRecordings = false
     @AppStorage("beautifyBackground") private var beautifyBackground = BeautifyBackground.ocean.rawValue
     @AppStorage("beautifyFrame") private var beautifyFrame = BeautifyFrame.none.rawValue
     @AppStorage("smartFilenames") private var smartFilenames = false
@@ -97,6 +99,8 @@ private struct GeneralSettingsView: View {
                 }
                 Toggle("Open trim editor after recording", isOn: $openTrimEditorAfterRecording)
                 Toggle("Add click ripples to recordings", isOn: $addClickEffectsToRecordings)
+                Toggle("Auto-zoom to cursor in recordings", isOn: $autoZoomRecordings)
+                Toggle("Show keystrokes in recordings", isOn: $keystrokeOverlayRecordings)
                 Picker("Beautify background", selection: $beautifyBackground) {
                     ForEach(BeautifyBackground.allCases, id: \.rawValue) { background in
                         Text(background.title).tag(background.rawValue)

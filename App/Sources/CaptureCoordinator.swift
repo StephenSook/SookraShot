@@ -165,13 +165,16 @@ final class CaptureCoordinator {
     /// Start capturing clicks for post-recording ripples, when enabled and the
     /// target has a stable coordinate mapping (display or area, not a window).
     private func beginEffectsCapture(for target: RecordingTarget) {
-        guard AppSettings.shared.addClickEffectsToRecordings,
-              let mapping = mappingContext(for: target) else {
+        let settings = AppSettings.shared
+        let anyEffect = settings.addClickEffectsToRecordings
+            || settings.autoZoomRecordings
+            || settings.keystrokeOverlayRecordings
+        guard anyEffect, let mapping = mappingContext(for: target) else {
             effectsMapping = nil
             return
         }
         effectsMapping = mapping
-        inputMonitor.start()
+        inputMonitor.start(captureKeystrokes: settings.keystrokeOverlayRecordings)
     }
 
     private func mappingContext(for target: RecordingTarget) -> RecordingEnhancer.Mapping? {
@@ -219,16 +222,22 @@ final class CaptureCoordinator {
             return destination
         }
 
-        if let mapping, let clickLog, !clickLog.clicks.isEmpty {
-            do {
-                let enhanced = try await enhancer.enhance(
-                    source: tempURL, clicks: clickLog.clicks, mapping: mapping,
-                    toDirectory: settings.saveDirectory, baseName: base
-                )
-                try? FileManager.default.removeItem(at: tempURL)
-                return enhanced
-            } catch {
-                NSLog("SookraShot recording enhance failed, saving raw: \(error)")
+        if let mapping, let clickLog {
+            let showRipples = settings.addClickEffectsToRecordings
+            let autoZoom = settings.autoZoomRecordings
+            let hasWork = (!clickLog.clicks.isEmpty && (showRipples || autoZoom)) || !clickLog.keystrokes.isEmpty
+            if hasWork {
+                do {
+                    let enhanced = try await enhancer.enhance(
+                        source: tempURL, clicks: clickLog.clicks, keystrokes: clickLog.keystrokes,
+                        mapping: mapping, showRipples: showRipples, autoZoom: autoZoom,
+                        toDirectory: settings.saveDirectory, baseName: base
+                    )
+                    try? FileManager.default.removeItem(at: tempURL)
+                    return enhanced
+                } catch {
+                    NSLog("SookraShot recording enhance failed, saving raw: \(error)")
+                }
             }
         }
 
