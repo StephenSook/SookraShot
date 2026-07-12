@@ -52,5 +52,6 @@ let package = Package(
         .testTarget(name: "ScrollCaptureKitTests", dependencies: ["ScrollCaptureKit"]),
         .testTarget(name: "CloudShareKitTests", dependencies: ["CloudShareKit"]),
         .testTarget(name: "BeautifyKitTests", dependencies: ["BeautifyKit"]),
+        .testTarget(name: "QuickAccessKitTests", dependencies: ["QuickAccessKit"]),
     ]
 )
