@@ -65,4 +65,8 @@ public struct AppSettings: Sendable {
     public var captureDelaySeconds: Int {
         defaults.integer(forKey: "captureDelaySeconds")
     }
+
+    public var autoScrollScrollingCapture: Bool {
+        defaults.bool(forKey: "autoScrollScrollingCapture")
+    }
 }

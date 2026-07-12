@@ -22,6 +22,8 @@ Default shortcuts (remap in Settings; disable the system ones in System Settings
 
 URL scheme: `sookrashot://capture-area`, `capture-fullscreen`, `capture-text`, `record-screen` (`?mic=1`), `stop-recording`, `scrolling-capture`, `ask-claude`, `cloud-share`, `sample-color`, `capture-previous-area` — usable from Raycast, Shortcuts, or scripts.
 
+Scrolling capture can drive itself: turn on **Auto-scroll during scrolling capture** in Settings and SookraShot scrolls the selected region for you and stops at the end of the content (uses the Accessibility grant it already has for area selection).
+
 Other conveniences: **Capture Previous Area** re-shoots the last region without the overlay; a **self-timer** (Settings > General) delays a fullscreen capture; **Copy as Markdown code** on a thumbnail wraps the OCR'd text in a fenced code block; and turning on **Name saved files from their text** derives filenames from a capture's content. The Quick Access panel uses macOS 26 Liquid Glass.
 
 Recordings can be trimmed: pick **Trim a Video…** from the menu bar (or turn on "Open trim editor after recording" in Settings) to open a clip in the native QuickTime-style trim UI and export the selected range.

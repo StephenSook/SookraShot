@@ -82,7 +82,10 @@ final class CaptureCoordinator {
         guard case .area(let displayID, let rectInDisplay, let scale) = result else { return }
         let session = ScrollCaptureSession()
         scrollSession = session
-        let image = await session.run(displayID: displayID, rectInDisplay: rectInDisplay, scale: scale)
+        let image = await session.run(
+            displayID: displayID, rectInDisplay: rectInDisplay, scale: scale,
+            autoScroll: AppSettings.shared.autoScrollScrollingCapture
+        )
         scrollSession = nil
         if let image {
             deliver(image, displayID: displayID)

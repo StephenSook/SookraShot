@@ -17,40 +17,80 @@ public final class ScrollCaptureSession {
 
     private static let frameInterval: Duration = .milliseconds(350)
     private static let maxFrames = 200
+    /// Consecutive frames with no new content before auto-scroll assumes the
+    /// end of the page.
+    private static let autoStallLimit = 3
 
     public init() {}
 
     /// Runs the session; resolves with the stitched image, or nil on cancel.
+    /// With `autoScroll`, the session scrolls the region itself and stops at the
+    /// end of the content instead of waiting for the user to scroll.
     public func run(
         displayID: CGDirectDisplayID,
         rectInDisplay: CGRect,
-        scale: CGFloat
+        scale: CGFloat,
+        autoScroll: Bool = false
     ) async -> CGImage? {
         await withCheckedContinuation { continuation in
             completion = continuation
             presentHUD(displayID: displayID, rectInDisplay: rectInDisplay)
             captureTask = Task { [weak self] in
-                await self?.captureLoop(displayID: displayID, rectInDisplay: rectInDisplay, scale: scale)
+                await self?.captureLoop(displayID: displayID, rectInDisplay: rectInDisplay, scale: scale, autoScroll: autoScroll)
             }
         }
     }
 
-    private func captureLoop(displayID: CGDirectDisplayID, rectInDisplay: CGRect, scale: CGFloat) async {
+    private func captureLoop(displayID: CGDirectDisplayID, rectInDisplay: CGRect, scale: CGFloat, autoScroll: Bool) async {
         var isFirst = true
+        var stalls = 0
+        let scrollPoint = autoScroll ? globalCenter(displayID: displayID, rectInDisplay: rectInDisplay) : nil
+        let scrollDelta = Int32(-(rectInDisplay.height * 0.82))
+
         while !Task.isCancelled, frameCount < Self.maxFrames {
             do {
                 let frame = try await capturer.captureRect(rectInDisplay, displayID: displayID, scale: scale)
                 if isFirst {
                     stitcher.start(with: frame)
                     isFirst = false
-                } else if case .appended = stitcher.append(frame) {
-                    frameCount += 1
-                    hud?.update(frames: frameCount)
+                } else {
+                    switch stitcher.append(frame) {
+                    case .appended:
+                        frameCount += 1
+                        hud?.update(frames: frameCount)
+                        stalls = 0
+                    case .noNewContent, .lowConfidence:
+                        if autoScroll { stalls += 1 }
+                    }
                 }
             } catch {
                 NSLog("SookraShot scroll frame failed: \(error)")
             }
+
+            if autoScroll {
+                if stalls >= Self.autoStallLimit { break }
+                if let scrollPoint { postScroll(at: scrollPoint, delta: scrollDelta) }
+            }
             try? await Task.sleep(for: Self.frameInterval)
+        }
+
+        if autoScroll {
+            finish(cancelled: false)
+        }
+    }
+
+    /// Region center in global (top-left origin) display coordinates.
+    private func globalCenter(displayID: CGDirectDisplayID, rectInDisplay: CGRect) -> CGPoint {
+        let bounds = CGDisplayBounds(displayID)
+        return CGPoint(x: bounds.minX + rectInDisplay.midX, y: bounds.minY + rectInDisplay.midY)
+    }
+
+    /// Posts a scroll-wheel event over the region (needs the Accessibility grant
+    /// we already have for the selection tap).
+    private func postScroll(at point: CGPoint, delta: Int32) {
+        CGWarpMouseCursorPosition(point)
+        if let event = CGEvent(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: delta, wheel2: 0, wheel3: 0) {
+            event.post(tap: .cgSessionEventTap)
         }
     }
 
