@@ -15,6 +15,7 @@ public struct HotkeySettingsView: View {
             KeyboardShortcuts.Recorder("Scrolling Capture", name: .scrollingCapture)
             KeyboardShortcuts.Recorder("Ask Claude", name: .askClaude)
             KeyboardShortcuts.Recorder("Share as Link (B2)", name: .cloudShare)
+            KeyboardShortcuts.Recorder("Sample Color (hex)", name: .sampleColor)
         }
         .padding(20)
     }

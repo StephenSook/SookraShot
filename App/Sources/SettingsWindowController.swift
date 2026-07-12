@@ -59,6 +59,8 @@ private struct GeneralSettingsView: View {
     @AppStorage("openTrimEditorAfterRecording") private var openTrimEditorAfterRecording = false
     @AppStorage("addClickEffectsToRecordings") private var addClickEffectsToRecordings = false
     @AppStorage("beautifyBackground") private var beautifyBackground = BeautifyBackground.ocean.rawValue
+    @AppStorage("smartFilenames") private var smartFilenames = false
+    @AppStorage("captureDelaySeconds") private var captureDelaySeconds = 0
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
 
     var body: some View {
@@ -76,6 +78,13 @@ private struct GeneralSettingsView: View {
                     ForEach(ImageFormat.allCases, id: \.rawValue) { format in
                         Text(format.rawValue.uppercased()).tag(format.rawValue)
                     }
+                }
+                Toggle("Name saved files from their text (OCR)", isOn: $smartFilenames)
+                Picker("Self-timer (fullscreen)", selection: $captureDelaySeconds) {
+                    Text("Off").tag(0)
+                    Text("3 seconds").tag(3)
+                    Text("5 seconds").tag(5)
+                    Text("10 seconds").tag(10)
                 }
                 Picker("Thumbnail corner", selection: $overlayCorner) {
                     Text("Bottom Left").tag(OverlayCorner.bottomLeft.rawValue)

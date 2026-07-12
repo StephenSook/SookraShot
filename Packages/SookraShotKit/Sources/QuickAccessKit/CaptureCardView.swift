@@ -8,6 +8,7 @@ final class CaptureCardView: NSView {
     enum Action {
         case copy
         case copyText
+        case copyMarkdown
         case save
         case annotate
         case askClaude
@@ -36,15 +37,11 @@ final class CaptureCardView: NSView {
     required init?(coder: NSCoder) { fatalError("not used") }
 
     private func buildContents() {
-        let background = NSVisualEffectView()
-        background.material = .hudWindow
-        background.blendingMode = .behindWindow
-        background.state = .active
-        background.wantsLayer = true
-        background.layer?.cornerRadius = 12
-        background.layer?.masksToBounds = true
-        background.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(background)
+        // Liquid Glass panel (macOS 26 Tahoe).
+        let glass = NSGlassEffectView()
+        glass.cornerRadius = 12
+        glass.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(glass)
 
         layer?.shadowColor = NSColor.black.cgColor
         layer?.shadowOpacity = 0.35
@@ -58,6 +55,7 @@ final class CaptureCardView: NSView {
 
         let copyButton = actionButton("doc.on.doc", "Copy", .copy)
         let copyTextButton = actionButton("textformat", "Copy text (OCR)", .copyText)
+        let copyMarkdownButton = actionButton("chevron.left.forwardslash.chevron.right", "Copy as Markdown code", .copyMarkdown)
         let saveButton = actionButton("square.and.arrow.down", "Save", .save)
         let annotateButton = actionButton("pencil.tip.crop.circle", "Annotate", .annotate)
         let askClaudeButton = actionButton("sparkles", "Ask Claude", .askClaude)
@@ -67,7 +65,7 @@ final class CaptureCardView: NSView {
         let pinButton = actionButton("pin", "Pin on top", .pin)
         let closeButton = actionButton("xmark", "Dismiss", .dismiss)
 
-        let buttons = NSStackView(views: [copyButton, copyTextButton, saveButton, annotateButton, askClaudeButton, shareLinkButton, beautifyButton, safeShareButton, pinButton, NSView(), closeButton])
+        let buttons = NSStackView(views: [copyButton, copyTextButton, copyMarkdownButton, saveButton, annotateButton, askClaudeButton, shareLinkButton, beautifyButton, safeShareButton, pinButton, NSView(), closeButton])
         buttons.orientation = .horizontal
         buttons.spacing = 6
         buttons.translatesAutoresizingMaskIntoConstraints = false
@@ -78,13 +76,13 @@ final class CaptureCardView: NSView {
         content.spacing = 6
         content.edgeInsets = NSEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
         content.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(content)
+        glass.contentView = content
 
         NSLayoutConstraint.activate([
-            background.leadingAnchor.constraint(equalTo: leadingAnchor),
-            background.trailingAnchor.constraint(equalTo: trailingAnchor),
-            background.topAnchor.constraint(equalTo: topAnchor),
-            background.bottomAnchor.constraint(equalTo: bottomAnchor),
+            glass.leadingAnchor.constraint(equalTo: leadingAnchor),
+            glass.trailingAnchor.constraint(equalTo: trailingAnchor),
+            glass.topAnchor.constraint(equalTo: topAnchor),
+            glass.bottomAnchor.constraint(equalTo: bottomAnchor),
 
             content.leadingAnchor.constraint(equalTo: leadingAnchor),
             content.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -115,6 +113,7 @@ final class CaptureCardView: NSView {
         switch action {
         case .copy: button.action = #selector(copyTapped)
         case .copyText: button.action = #selector(copyTextTapped)
+        case .copyMarkdown: button.action = #selector(copyMarkdownTapped)
         case .save: button.action = #selector(saveTapped)
         case .annotate: button.action = #selector(annotateTapped)
         case .askClaude: button.action = #selector(askClaudeTapped)
@@ -129,6 +128,7 @@ final class CaptureCardView: NSView {
 
     @objc private func copyTapped() { onAction(self, .copy) }
     @objc private func copyTextTapped() { onAction(self, .copyText) }
+    @objc private func copyMarkdownTapped() { onAction(self, .copyMarkdown) }
     @objc private func pinTapped() { onAction(self, .pin) }
     @objc private func saveTapped() { onAction(self, .save) }
     @objc private func annotateTapped() { onAction(self, .annotate) }

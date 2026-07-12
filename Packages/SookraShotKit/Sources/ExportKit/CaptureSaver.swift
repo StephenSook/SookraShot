@@ -17,12 +17,13 @@ public struct CaptureSaver: Sendable {
         _ capture: DeliveredCapture,
         format: ImageFormat = AppSettings.shared.imageFormat,
         directory: URL = AppSettings.shared.saveDirectory,
-        template: FilenameTemplate = AppSettings.shared.filenameTemplate
+        template: FilenameTemplate = AppSettings.shared.filenameTemplate,
+        baseName: String? = nil
     ) throws -> URL {
         guard let data = encoder.data(from: capture.image, format: format) else {
             throw SaveError.encodingFailed
         }
-        let base = template.filename(for: capture.capturedAt)
+        let base = baseName ?? template.filename(for: capture.capturedAt)
         var url = directory.appendingPathComponent(base).appendingPathExtension(format.fileExtension)
         var counter = 2
         while FileManager.default.fileExists(atPath: url.path) {
