@@ -41,6 +41,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             case .scrollingCapture:
                 coordinator.scrollingCapture()
+            case .askClaude:
+                coordinator.askClaudeArea()
             }
         }
     }
@@ -63,6 +65,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 coordinator.stopRecording()
             case "scrolling-capture":
                 coordinator.scrollingCapture()
+            case "ask-claude":
+                coordinator.askClaudeArea()
             default:
                 NSLog("SookraShot: unhandled URL \(url.absoluteString)")
             }
